@@ -1,5 +1,6 @@
 """
 Author: Chris Dijkstra
+Date: 2/10/2023
 Contains the class SkeletonNetwork, which can be utilized to read in skele-
 tonized images and output an edge graph, where each intersection of lines is
 considered a node and the connecting lines the edges.
