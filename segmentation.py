@@ -27,8 +27,6 @@ def map_grid(n_points, shape):
     """
     grid = util.regular_grid(shape, n_points)
     grid_map = np.zeros(shape)
-    print(image.shape)
-    print(grid_map.shape)
     grid_map[grid] = np.arange(
         grid_map[grid].size).reshape(grid_map[grid].shape) + 1
     return grid_map
