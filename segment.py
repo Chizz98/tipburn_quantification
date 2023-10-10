@@ -1,4 +1,4 @@
-from skimage import io, color, filters, segmentation, util
+from skimage import io, color, filters, segmentation, util, morphology
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -32,14 +32,14 @@ def map_grid(n_points, shape):
     return grid_map
 
 
-def multichannel_threshold(multi_ch_im, x_th, y_th, z_th):
+def multichannel_threshold(multi_ch_im, x_th=0.0, y_th=0.0, z_th=0.0):
     """ Takes a three-channel image and returns a mask based on thresholds
 
     :param multi_ch_im: np.nd_array a numpy array representing an image with
         three color channels
-    :param x_th: float, the threshold for the first channel
-    :param y_th: float, the threshold for the second channel
-    :param z_th: float, the threshold for the third channel
+    :param x_th: float, the threshold for the first channel, 0.0 by default
+    :param y_th: float, the threshold for the second channel, 0.0 by default
+    :param z_th: float, the threshold for the third channel, 0.0 by default
     :return: np.nd_array, the mask created based on the thresholds, 2D array
         same width and height as the input
     """
@@ -47,7 +47,7 @@ def multichannel_threshold(multi_ch_im, x_th, y_th, z_th):
     mask[multi_ch_im[:, :, 0] < x_th] = 0
     mask[multi_ch_im[:, :, 1] < y_th] = 0
     mask[multi_ch_im[:, :, 2] < z_th] = 0
-    return mask
+    return mask.astype(int)
 
 
 def watershed_blur(rgb_im, n_seeds):
@@ -80,9 +80,34 @@ def water_hsv_thresh(rgb_im, n_seeds, h_th=0.0, s_th=0.0, v_th=0.0):
     """
     blurred = watershed_blur(rgb_im, n_seeds)
     hsv_blurred = color.rgb2hsv(blurred)
-    return
+    mask = multichannel_threshold(hsv_blurred, h_th, s_th, v_th)
+    return mask.astype(int)
+
+
+def merge_masks(bg_mask, pheno_mask):
+    """ Merges 2 binary masks into one mask, where phenotype has high values
+
+    :param bg_mask: np.ndarray, 2D mask with background as 0 and foreground as
+        1
+    :param pheno_mask: np.ndarray, 2D mask phenotype marked as 1 and everything
+        else as 0
+    :return np.ndarray, 2D mask with background marked as 0, foreground as 1 and
+        phenotype area as 2
+    """
+    pheno_mask[bg_mask == 0] = 0
+    comb_mask = np.zeros_like(pheno_mask).astype(int)
+    comb_mask[bg_mask == 0] = 0
+    comb_mask[bg_mask == 1] = 1
+    comb_mask[pheno_mask == 1] = 2
+    return comb_mask
 
 
 if __name__ == "__main__":
     image = io.imread("test_images/tb_snap.png")
-    plant_mask = multichannel_threshold(image, 1, 2, 3)
+    plant_mask = water_hsv_thresh(image, 1500, s_th=0.25, v_th=0.1)
+    plant_mask = morphology.binary_opening(plant_mask)
+    hsv_im = color.rgb2hsv(image)
+    tb_mask = multichannel_threshold(hsv_im, x_th=0.105) == 0
+    multi_mask = merge_masks(plant_mask, tb_mask)
+    reg_hsv_mask = multichannel_threshold(color.rgb2hsv(image), y_th=0.25,
+                                          z_th=0.1)
