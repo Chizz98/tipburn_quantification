@@ -6,6 +6,9 @@ Contains functions to run segmentation from the command line
 """
 import argparse as arg
 import os
+import segment
+import matplotlib.pyplot as plt
+from skimage import io
 
 
 def arg_reader():
@@ -21,26 +24,36 @@ def arg_reader():
     arg_parser.add_argument(
         "-ht",
         help="The hue threshold, every pixel where the hue is below this will "
-             "be marked as 0. Hue is given in a range between 0 and 1."
+             "be marked as 0. Hue is given in a range between 0 and 1.",
+        type=float, default=0.0
     )
     arg_parser.add_argument(
         "-st",
         help="The saturation threshold, every pixel where the saturation is "
              "below this will be marked as 0. Saturation is given in a range "
-             "between 0 and 1."
+             "between 0 and 1.",
+        type=float, default=0.0
     )
     arg_parser.add_argument(
         "-vt",
         help="the value threshold, every pixel where the value will be below"
              "this threshold will be marked as 0. Saturation is given between 0"
-             "and 1"
+             "and 1",
+        type=float, default=0.0
     )
     return arg_parser.parse_args()
 
 
 def main():
     args = arg_reader()
-    print(args.filename)
+    directory = args.filename
+    if os.path.isdir(directory):
+        files = os.listdir(directory)
+        for file in files:
+            try:
+                io.imread(directory + "/" + file)
+            except:
+                print(f"Could not open {directory + '/' + file}")
 
 
 if __name__ == "__main__":
