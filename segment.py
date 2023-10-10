@@ -37,7 +37,8 @@ def map_grid(n_points, shape):
     return grid_map
 
 
-def multichannel_threshold(multi_ch_im, x_th=0.0, y_th=0.0, z_th=0.0):
+def multichannel_threshold(multi_ch_im, x_th=0.0, y_th=0.0, z_th=0.0,
+                           inverse=False):
     """ Takes a three-channel image and returns a mask based on thresholds
 
     :param multi_ch_im: np.nd_array a numpy array representing an image with
@@ -45,6 +46,8 @@ def multichannel_threshold(multi_ch_im, x_th=0.0, y_th=0.0, z_th=0.0):
     :param x_th: float, the threshold for the first channel, 0.0 by default
     :param y_th: float, the threshold for the second channel, 0.0 by default
     :param z_th: float, the threshold for the third channel, 0.0 by default
+    :param inverse: bool, if False pixels below the threshold are marked as 0,
+        if True, pixels above the threshold are marked as 0.
     :return: np.nd_array, the mask created based on the thresholds, 2D array
         same width and height as the input
     """
@@ -52,7 +55,10 @@ def multichannel_threshold(multi_ch_im, x_th=0.0, y_th=0.0, z_th=0.0):
     mask[multi_ch_im[:, :, 0] < x_th] = 0
     mask[multi_ch_im[:, :, 1] < y_th] = 0
     mask[multi_ch_im[:, :, 2] < z_th] = 0
-    return mask.astype(int)
+    mask = mask.astype(int)
+    if inverse:
+        mask = np.invert(mask)
+    return mask
 
 
 def watershed_blur(rgb_im, n_seeds):
@@ -107,13 +113,18 @@ def merge_masks(bg_mask, pheno_mask):
     return comb_mask
 
 
-if __name__ == "__main__":
+def main():
     import matplotlib.pyplot as plt
     image = io.imread("test_images/tb_snap.png")
     plant_mask = water_hsv_thresh(image, 1500, s_th=0.25, v_th=0.1)
     plant_mask = morphology.binary_opening(plant_mask)
     hsv_im = color.rgb2hsv(image)
-    tb_mask = multichannel_threshold(hsv_im, x_th=0.105) == 0
+    tb_mask = multichannel_threshold(hsv_im, x_th=0.105, inverse=True)
+
     multi_mask = merge_masks(plant_mask, tb_mask)
     reg_hsv_mask = multichannel_threshold(color.rgb2hsv(image), y_th=0.25,
                                           z_th=0.1)
+
+
+if __name__ == "__main__":
+    main()
