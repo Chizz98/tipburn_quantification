@@ -1,5 +1,10 @@
+"""
+Author: Chris Dijkstra
+Date: 10/10/2023
+
+Contains functions for segmenting RGB images
+"""
 from skimage import io, color, filters, segmentation, util, morphology
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -103,6 +108,7 @@ def merge_masks(bg_mask, pheno_mask):
 
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
     image = io.imread("test_images/tb_snap.png")
     plant_mask = water_hsv_thresh(image, 1500, s_th=0.25, v_th=0.1)
     plant_mask = morphology.binary_opening(plant_mask)
