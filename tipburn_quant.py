@@ -22,6 +22,11 @@ def arg_reader():
     arg_parser.add_argument("filename", help="The path to the directory holding"
                                              " the images")
     arg_parser.add_argument(
+        "seeds",
+        help="The number of starting seeds for the watershed segmentation",
+        type=int
+    )
+    arg_parser.add_argument(
         "-ht",
         help="The hue threshold, every pixel where the hue is below this will "
              "be marked as 0. Hue is given in a range between 0 and 1.",
@@ -51,9 +56,15 @@ def main():
         files = os.listdir(directory)
         for file in files:
             try:
-                io.imread(directory + "/" + file)
+                image = io.imread(directory + "/" + file)
             except:
                 print(f"Could not open {directory + '/' + file}")
+            else:
+                mask = segment.water_hsv_thresh(image, args.seeds, args.ht,
+                                                args.vt, args.st)
+                io.imsave(mask, f"out/{file}", arr=image.shape[0:2])
+                plt.imshow(mask)
+                plt.show()
 
 
 if __name__ == "__main__":
