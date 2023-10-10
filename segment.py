@@ -114,16 +114,19 @@ def merge_masks(bg_mask, pheno_mask):
 
 
 def main():
+    """ Main function, contains a test case """
     import matplotlib.pyplot as plt
     image = io.imread("test_images/tb_snap.png")
+    # Background segmentation
     plant_mask = water_hsv_thresh(image, 1500, s_th=0.25, v_th=0.1)
     plant_mask = morphology.binary_opening(plant_mask)
+    # Tipburn segmentation
     hsv_im = color.rgb2hsv(image)
     tb_mask = multichannel_threshold(hsv_im, x_th=0.105, inverse=True)
-
     multi_mask = merge_masks(plant_mask, tb_mask)
-    reg_hsv_mask = multichannel_threshold(color.rgb2hsv(image), y_th=0.25,
-                                          z_th=0.1)
+    # Visualization
+    plt.imshow(multi_mask)
+    plt.show()
 
 
 if __name__ == "__main__":
