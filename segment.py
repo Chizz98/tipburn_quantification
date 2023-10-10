@@ -116,7 +116,7 @@ def merge_masks(bg_mask, pheno_mask):
 def main():
     """ Main function, contains a test case """
     import matplotlib.pyplot as plt
-    image = io.imread("test_images/tb_snap.png")
+    image = io.imread("test_images/51-71-Lettuce_Correct_Tray_057-RGB-Original.png")
     # Background segmentation
     plant_mask = water_hsv_thresh(image, 1500, s_th=0.25, v_th=0.1)
     plant_mask = morphology.binary_opening(plant_mask)
