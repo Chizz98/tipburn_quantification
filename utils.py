@@ -2,8 +2,6 @@
 Author: Chris Dijkstra
 Date: 11/10/2023
 """
-
-
 import numpy as np
 
 
@@ -31,3 +29,18 @@ def crop_region(image, centre, shape):
                :
         ]
     return crop
+
+
+def read_fimg(filename):
+    """ Turns an FIMG value into a normalized file with data between 0 and 1
+
+    :param filename: str, name of the file that is to be opened
+    :return np.ndarray, 2D array representing the fimg image
+    """
+    image = np.fromfile(filename, np.dtype("uint32"))
+    shape = tuple(image[0:2][::-1])
+    image = image[2:]
+    image = np.reshape(image, newshape=shape)
+    normalized = (1 / 2 ** 32) * image
+    return normalized
+
