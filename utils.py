@@ -38,9 +38,9 @@ def read_fimg(filename):
     :return np.ndarray, 2D array representing the fimg image
     """
     image = np.fromfile(filename, np.dtype("uint32"))
-    shape = tuple(image[0:2][::-1])
+    shape = tuple(image[0:2][::-1]) 
     image = image[2:]
     image = np.reshape(image, newshape=shape)
-    normalized = (1 / 2 ** 32) * image
+    normalized = (1 / 2 ** 32) * image  # Normalize to max uint 32 value
     return normalized
 
