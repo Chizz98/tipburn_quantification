@@ -21,36 +21,13 @@ def crop_region(image, centre, shape):
     shape_r[shape_r % 2 == 1] += 1
     if image.ndim == 2:
         crop = image[
-                centre[0] - shape_r[0] // 2: centre[0] + shape[0] // 2,
-                centre[1] - shape_r[1] // 2: centre[1] + shape[1] // 2
+                centre[1] - shape_r[1] // 2: centre[1] + shape[1] // 2,
+                centre[0] - shape_r[0] // 2: centre[0] + shape[0] // 2
         ]
     else:
         crop = image[
-                centre[0] - shape_r[0] // 2: centre[0] + shape[0] // 2,
-                centre[1] - shape_r[1] // 2: centre[1] + shape[1] // 2,
-                :
+               centre[1] - shape_r[1] // 2: centre[1] + shape[1] // 2,
+               centre[0] - shape_r[0] // 2: centre[0] + shape[0] // 2,
+               :
         ]
     return crop
-
-
-def main():
-    """ Test function """
-    test = np.array([
-        list(range(1, 10)),
-        list(range(1, 10)),
-        list(range(1, 10)),
-        list(range(1, 10)),
-        list(range(1, 10)),
-        list(range(1, 10)),
-        list(range(1, 10)),
-        list(range(1, 10)),
-        list(range(1, 10)),
-        list(range(1, 10))
-    ])
-    print(test)
-    crop = crop_region(test, (5, 5), (2, 6))
-    print(crop)
-
-
-if __name__ == "__main__":
-    main()
