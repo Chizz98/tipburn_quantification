@@ -8,7 +8,8 @@ import argparse as arg
 import os
 import segment
 import matplotlib.pyplot as plt
-from skimage import io
+from skimage import io, morphology
+import numpy as np
 
 
 def arg_reader():
@@ -60,11 +61,13 @@ def main():
             except:
                 print(f"Could not open {directory + '/' + file}")
             else:
-                mask = segment.water_hsv_thresh(image, args.seeds, args.ht,
-                                                args.vt, args.st)
-                io.imsave(mask, f"out/{file}", arr=image.shape[0:2])
-                plt.imshow(mask)
-                plt.show()
+                mask = segment.water_hsv_thresh(
+                    rgb_im=image, n_seeds=args.seeds, h_th=args.ht,
+                    s_th=args.st, v_th=args.vt
+                )
+                mask = morphology.binary_opening(mask)
+                mask = morphology.remove_small_objects(mask)
+                plt.imsave("out/" + file, arr=mask, cmap="gray")
 
 
 if __name__ == "__main__":
