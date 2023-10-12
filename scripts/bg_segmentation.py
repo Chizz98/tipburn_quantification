@@ -30,7 +30,7 @@ def arg_reader():
     )
     arg_parser.add_argument("-o", help="The directory to write the files "
                                        "to. Does not need to be "
-                                       "pre_existing",
+                                       "pre_existing. ../out as default.",
                             default="../out")
     arg_parser.add_argument(
         "-ht",
@@ -72,7 +72,7 @@ def main():
                 )
                 mask = morphology.binary_opening(mask)
                 mask = morphology.remove_small_objects(mask)
-                plt.imsave("../out/" + file, arr=mask, cmap="gray")
+                plt.imsave(args.o + "/" + file, arr=mask, cmap="gray")
 
 
 if __name__ == "__main__":
