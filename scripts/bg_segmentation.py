@@ -74,7 +74,8 @@ def main():
                 mask = morphology.remove_small_objects(mask)
                 if not os.path.isdir(args.o):
                     os.mkdir(args.o)
-                plt.imsave(args.o + "/" + file, arr=mask, cmap="gray")
+                plt.imsave(args.o + "/" + file.replace(".png", "_mask.png"),
+                           arr=mask, cmap="gray")
 
 
 if __name__ == "__main__":
