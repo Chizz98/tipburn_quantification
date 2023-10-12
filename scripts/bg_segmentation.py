@@ -28,6 +28,10 @@ def arg_reader():
         help="The number of starting seeds for the watershed segmentation",
         type=int
     )
+    arg_parser.add_argument("-o", help="The directory to write the files "
+                                       "to. Does not need to be "
+                                       "pre_existing",
+                            default="../out")
     arg_parser.add_argument(
         "-ht",
         help="The hue threshold, every pixel where the hue is below this will "
