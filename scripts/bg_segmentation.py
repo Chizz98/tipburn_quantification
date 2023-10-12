@@ -72,6 +72,8 @@ def main():
                 )
                 mask = morphology.binary_opening(mask)
                 mask = morphology.remove_small_objects(mask)
+                if not os.path.isdir(args.o):
+                    os.mkdir(args.o)
                 plt.imsave(args.o + "/" + file, arr=mask, cmap="gray")
 
 
