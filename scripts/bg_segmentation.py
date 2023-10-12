@@ -68,7 +68,7 @@ def main():
                 )
                 mask = morphology.binary_opening(mask)
                 mask = morphology.remove_small_objects(mask)
-                plt.imsave("out/" + file, arr=mask, cmap="gray")
+                plt.imsave("../out/" + file, arr=mask, cmap="gray")
 
 
 if __name__ == "__main__":
