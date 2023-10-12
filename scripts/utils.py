@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Author: Chris Dijkstra
 Date: 11/10/2023
