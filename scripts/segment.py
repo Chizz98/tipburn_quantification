@@ -73,7 +73,8 @@ def watershed_blur(rgb_im, n_seeds):
     elevation = elevation_map(rgb_im)
     seeds = map_grid(n_seeds, rgb_im.shape[0:2])
     labels = segmentation.watershed(elevation, seeds)
-    average_cols = color.label2rgb(labels, rgb_im, kind="avg")
+    average_cols = color.label2rgb(labels, rgb_im, kind="avg",
+                                   bg_label=0).astype(np.uint8)
     return average_cols
 
 
