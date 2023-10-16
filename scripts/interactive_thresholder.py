@@ -99,7 +99,7 @@ class MainWindow(tk.Tk):
             master=self.fr_threshold,
             variable=self.var_th1,
             length="7i",
-            resolution=0.0001,
+            resolution=0.001,
             orient=tk.HORIZONTAL,
             state=tk.DISABLED,
             takefocus=0,
@@ -122,7 +122,7 @@ class MainWindow(tk.Tk):
             master=self.fr_threshold,
             variable=self.var_th2,
             length="7i",
-            resolution=0.0001,
+            resolution=0.001,
             state=tk.DISABLED,
             orient=tk.HORIZONTAL,
             takefocus=0,
@@ -144,7 +144,7 @@ class MainWindow(tk.Tk):
             master=self.fr_threshold,
             variable=self.var_th3,
             length="7i",
-            resolution=0.0001,
+            resolution=0.001,
             orient=tk.HORIZONTAL,
             takefocus=0,
             fg="lightgray",
@@ -189,14 +189,17 @@ class MainWindow(tk.Tk):
             child.destroy()
         fig = plt.Figure(
             figsize=(4, 4),
-            dpi=110,
+            dpi=115,
             tight_layout=True
         )
         image = fig.add_subplot()
         if mask:
             image.imshow(im, cmap="cividis", vmin=0, vmax=1)
         else:
-            image.imshow(im)
+            if im.ndim == 2:
+                image.imshow(im, cmap="plasma")
+            else:
+                image.imshow(im)
         image.axis("off")
         canvas = FigureCanvasTkAgg(figure=fig, master=master)
         canvas.draw()
@@ -292,7 +295,7 @@ class MainWindow(tk.Tk):
 
 def main():
     window = MainWindow()
-    #window.state("zoomed")
+    window.state("zoomed")
     window.iconbitmap(r"C:\Users\chris\Documents\GitHub\tipburn_quantification"
                       r"\logo\lettuce.ico")
     window.mainloop()
