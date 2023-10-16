@@ -123,6 +123,7 @@ class MainWindow(tk.Tk):
             variable=self.var_th2,
             length="7i",
             resolution=0.0001,
+            state=tk.DISABLED,
             orient=tk.HORIZONTAL,
             takefocus=0,
             fg="lightgray"
