@@ -43,5 +43,6 @@ def read_fimg(filename):
     image = np.fromfile(filename, np.dtype("float32"))
     image = image[2:]
     image = np.reshape(image, newshape=(1024, 1360))
+    image[image < 0] = 0
     return image
 
