@@ -24,6 +24,7 @@ class MainWindow(tk.Tk):
         self.filename = None
         self.im_arr = None
         self.mask_arr = None
+        self.saved_mask = None
 
         # Tk variables
         self.var_th1 = tk.IntVar()
@@ -48,22 +49,37 @@ class MainWindow(tk.Tk):
             command=self._to_hsv
         )
         self.bt_hsv.grid(row=0, column=1)
+        self.bt_save_mask = ttk.Button(
+            master=self.fr_topbar,
+            text="Save mask",
+            state=tk.DISABLED,
+            command=self._save_mask
+        )
+        self.bt_save_mask.grid(row=0, column=2)
+        self.bt_apply_mask = ttk.Button(
+            master=self.fr_topbar,
+            text="Apply mask",
+            state=tk.DISABLED,
+            command=self._apply_mask
+        )
+        self.bt_apply_mask.grid(row=0, column=3)
         self.lb_watershed = ttk.Label(
             master=self.fr_topbar,
             text="Number of seeds:"
         )
-        self.lb_watershed.grid(row=0, column=2)
+        self.lb_watershed.grid(row=0, column=4)
         self.en_watershed = ttk.Entry(
             master=self.fr_topbar
         )
-        self.en_watershed.grid(row=0, column=3)
+        self.en_watershed.grid(row=0, column=5)
         self.bt_watershed = ttk.Button(
             master=self.fr_topbar,
             text="Watershed blur",
             state=tk.DISABLED,
             command=self._watershed
         )
-        self.bt_watershed.grid(row=0, column=4)
+        self.bt_watershed.grid(row=0, column=6)
+
         for child in self.fr_topbar.winfo_children():
             child.grid_configure(padx=5, pady=3)
 
@@ -278,6 +294,7 @@ class MainWindow(tk.Tk):
                 self.im_arr, th1, th2, th3
             )
         self._show_image(self.mask_arr, self.fr_mask, tb=False, mask=True)
+        self.bt_save_mask.configure(state="normal")
 
     def _to_hsv(self):
         self.im_arr = color.rgb2hsv(self.im_arr)
@@ -290,6 +307,14 @@ class MainWindow(tk.Tk):
     def _watershed(self):
         seeds = int(self.en_watershed.get())
         self.im_arr = segment.watershed_blur(self.im_arr, seeds)
+        self._show_image(self.im_arr, self.fr_image)
+
+    def _save_mask(self):
+        self.saved_mask = self.mask_arr
+        self.bt_apply_mask.configure(state="normal")
+
+    def _apply_mask(self):
+        self.im_arr = self.im_arr * self.saved_mask
         self._show_image(self.im_arr, self.fr_image)
 
 
