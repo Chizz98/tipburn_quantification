@@ -40,10 +40,8 @@ def read_fimg(filename):
     :param filename: str, name of the file that is to be opened
     :return np.ndarray, 2D array representing the fimg image
     """
-    image = np.fromfile(filename, np.dtype("uint32"))
-    shape = tuple(image[0:2][::-1])
+    image = np.fromfile(filename, np.dtype("float32"))
     image = image[2:]
-    image = np.reshape(image, newshape=shape)
-    normalized = (1 / 2 ** 32) * image  # Normalize to max uint 32 value
-    return normalized
+    image = np.reshape(image, newshape=(1024, 1360))
+    return image
 
