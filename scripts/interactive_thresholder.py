@@ -26,7 +26,9 @@ class MainWindow(tk.Tk):
         self.mask_arr = None
 
         # Tk variables
-        self.var_x_th = tk.IntVar()
+        self.var_th1 = tk.IntVar()
+        self.var_th2 = tk.IntVar()
+        self.var_th3 = tk.IntVar()
 
         # Widgets
         self.fr_topbar = ttk.Frame( # Toplevel frame
@@ -48,7 +50,7 @@ class MainWindow(tk.Tk):
         self.bt_hsv.grid(row=0, column=1)
         self.lb_watershed = ttk.Label(
             master=self.fr_topbar,
-            text="Set seeds"
+            text="Number of seeds:"
         )
         self.lb_watershed.grid(row=0, column=2)
         self.en_watershed = ttk.Entry(
@@ -62,6 +64,9 @@ class MainWindow(tk.Tk):
             command=self._watershed
         )
         self.bt_watershed.grid(row=0, column=4)
+        for child in self.fr_topbar.winfo_children():
+            child.grid_configure(padx=5, pady=3)
+
         self.fr_image = ttk.Frame(  # Frame for showing the images
             master=self,
             width="4i",
@@ -76,11 +81,23 @@ class MainWindow(tk.Tk):
         self.fr_mask.grid(row=1, column=1, sticky="nw")
         self.fr_threshold = ttk.Frame(  # Frame for threshold scales
             master=self,
-            width="6i"
+            width="6i",
         )
         self.fr_threshold.grid(row=2, columnspan=2)
+        self.lb_th1 = ttk.Label(
+            master=self.fr_threshold,
+            text="Channel 1 threshold",
+        )
+        self.lb_th1.grid(row=0, column=0)
+        self.en_th1 = ttk.Entry(
+            master=self.fr_threshold,
+            textvariable=self.var_th1,
+            state=tk.DISABLED
+        )
+        self.en_th1.grid(row=0, column=1)
         self.sc_th1 = tk.Scale(
             master=self.fr_threshold,
+            variable=self.var_th1,
             length="7i",
             resolution=0.0001,
             orient=tk.HORIZONTAL,
@@ -88,25 +105,53 @@ class MainWindow(tk.Tk):
             takefocus=0,
             fg="lightgray"
         )
-        self.sc_th1.grid(row=0, column=0)
+        self.sc_th1.grid(row=0, column=2)
+
+        self.lb_th2 = ttk.Label(
+            master=self.fr_threshold,
+            text="Channel 2 threshold"
+        )
+        self.lb_th2.grid(row=1, column=0)
+        self.en_th2 = ttk.Entry(
+            master=self.fr_threshold,
+            textvariable=self.var_th2,
+            state=tk.DISABLED
+        )
+        self.en_th2.grid(row=1, column=1)
         self.sc_th2 = tk.Scale(
             master=self.fr_threshold,
+            variable=self.var_th2,
             length="7i",
             resolution=0.0001,
             orient=tk.HORIZONTAL,
             takefocus=0,
             fg="lightgray"
         )
-        self.sc_th2.grid(row=1, column=0)
+        self.sc_th2.grid(row=1, column=2)
+        self.lb_th3 = ttk.Label(
+            master=self.fr_threshold,
+            text="Channel 3 threshold"
+        )
+        self.lb_th3.grid(row=2, column=0)
+        self.en_th3 = ttk.Entry(
+            master=self.fr_threshold,
+            textvariable=self.var_th3,
+            state=tk.DISABLED
+        )
+        self.en_th3.grid(row=2, column=1)
         self.sc_th3 = tk.Scale(
             master=self.fr_threshold,
+            variable=self.var_th3,
             length="7i",
             resolution=0.0001,
             orient=tk.HORIZONTAL,
             takefocus=0,
             fg="lightgray"
         )
-        self.sc_th3.grid(row=2, column=0)
+        self.sc_th3.grid(row=2, column=2)
+        for child in self.fr_threshold.winfo_children():
+            child.grid_configure(padx=5, pady=2)
+
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
@@ -169,35 +214,52 @@ class MainWindow(tk.Tk):
                 fg="black"
             )
             self.sc_th1.bind("<ButtonRelease-1>", self._update_mask)
+            self.en_th1.bind("<Return>", self._update_mask)
             self.sc_th2.configure(state=tk.DISABLED)
-            self.sc_th2.set(0)
+            self.sc_th2.unbind("<ButtonRelease-1>")
+            self.en_th2.configure(state=tk.DISABLED)
+            self.var_th2.set(0)
             self.sc_th3.configure(state=tk.DISABLED)
-            self.sc_th3.set(0)
+            self.en_th3.configure(state=tk.DISABLED)
+            self.sc_th3.unbind("<ButtonRelease-1>")
+            self.var_th3.set(0)
         else:
+            self.var_th1.set(0)
             self.sc_th1.configure(
                 state="normal",
                 from_=0,
                 to=self.im_arr[:, :, 0].max(),
                 fg="black"
             )
-            self.sc_th1.set(0)
             self.sc_th1.bind("<ButtonRelease-1>", self._update_mask)
+            self.en_th1.configure(
+                state="normal"
+            )
+            self.en_th1.bind("<Return>", self._update_mask)
+            self.var_th2.set(0)
             self.sc_th2.configure(
                 state="normal",
                 from_=0,
                 to=self.im_arr[:, :, 1].max(),
                 fg="black"
             )
-            self.sc_th2.set(0)
             self.sc_th2.bind("<ButtonRelease-1>", self._update_mask)
+            self.en_th2.configure(
+                state="normal"
+            )
+            self.en_th2.bind("<Return>", self._update_mask)
+            self.var_th3.set(0)
             self.sc_th3.configure(
                 state="normal",
                 from_=0,
                 to=self.im_arr[:, :, 2].max(),
                 fg="black"
             )
-            self.sc_th3.set(0)
             self.sc_th3.bind("<ButtonRelease-1>", self._update_mask)
+            self.en_th3.configure(
+                state="normal"
+            )
+            self.en_th3.bind("<Return>", self._update_mask)
 
     def _update_mask(self, *args):
         if self.im_arr.ndim == 2:
