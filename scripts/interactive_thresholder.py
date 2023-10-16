@@ -322,9 +322,15 @@ class MainWindow(tk.Tk):
         self.bt_apply_mask.configure(state="normal")
 
     def _apply_mask(self):
-        self.im_arr = self.im_arr * self.saved_mask
+        if self.im_arr.ndim == 2:
+            self.im_arr = self.im_arr * self.saved_mask
+        else:
+            self.im_arr[:, :, 0] *= self.saved_mask.astype(np.uint8)
+            self.im_arr[:, :, 1] *= self.saved_mask.astype(np.uint8)
+            self.im_arr[:, :, 2] *= self.saved_mask.astype(np.uint8)
         self._show_image(self.im_arr, self.fr_image)
         self.overlap_masks = True
+        self.bt_apply_mask.configure(state=tk.DISABLED)
 
 
 def main():
