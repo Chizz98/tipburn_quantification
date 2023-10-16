@@ -25,6 +25,7 @@ class MainWindow(tk.Tk):
         self.im_arr = None
         self.mask_arr = None
         self.saved_mask = None
+        self.overlap_masks = False
 
         # Tk variables
         self.var_th1 = tk.IntVar()
@@ -198,6 +199,7 @@ class MainWindow(tk.Tk):
         self._show_image(self.im_arr, self.fr_image)
         self._show_image(self.mask_arr, self.fr_mask, tb=False, mask=True)
         self._threshold_bars()
+        self.overlap_masks = False
 
     def _show_image(self, im, master, tb=True, mask=False):
         """ Opens an image as np array """
@@ -210,7 +212,7 @@ class MainWindow(tk.Tk):
         )
         image = fig.add_subplot()
         if mask:
-            image.imshow(im, cmap="cividis", vmin=0, vmax=1)
+            image.imshow(im, cmap="viridis", vmin=0, vmax=2)
         else:
             if im.ndim == 2:
                 image.imshow(im, cmap="plasma")
@@ -237,6 +239,7 @@ class MainWindow(tk.Tk):
             self.sc_th1.bind("<ButtonRelease-1>", self._update_mask)
             self.en_th1.configure(state="normal")
             self.en_th1.bind("<Return>", self._update_mask)
+            self.var_th1.set(0)
             self.sc_th2.configure(state=tk.DISABLED)
             self.sc_th2.unbind("<ButtonRelease-1>")
             self.en_th2.configure(state=tk.DISABLED)
@@ -293,6 +296,11 @@ class MainWindow(tk.Tk):
             self.mask_arr = segment.multichannel_threshold(
                 self.im_arr, th1, th2, th3
             )
+        self.mask_arr = self.mask_arr.astype(int)
+        if self.overlap_masks:
+            substep = self.mask_arr + self.saved_mask.astype(int)
+            self.mask_arr[substep == 1] = 2
+            self.mask_arr[substep == 2] = 1
         self._show_image(self.mask_arr, self.fr_mask, tb=False, mask=True)
         self.bt_save_mask.configure(state="normal")
 
@@ -316,6 +324,7 @@ class MainWindow(tk.Tk):
     def _apply_mask(self):
         self.im_arr = self.im_arr * self.saved_mask
         self._show_image(self.im_arr, self.fr_image)
+        self.overlap_masks = True
 
 
 def main():
@@ -328,4 +337,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
