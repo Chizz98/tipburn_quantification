@@ -147,7 +147,8 @@ class MainWindow(tk.Tk):
             resolution=0.0001,
             orient=tk.HORIZONTAL,
             takefocus=0,
-            fg="lightgray"
+            fg="lightgray",
+            state=tk.DISABLED
         )
         self.sc_th3.grid(row=2, column=2)
         for child in self.fr_threshold.winfo_children():
