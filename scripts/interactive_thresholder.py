@@ -216,6 +216,7 @@ class MainWindow(tk.Tk):
                 fg="black"
             )
             self.sc_th1.bind("<ButtonRelease-1>", self._update_mask)
+            self.en_th1.configure(state="normal")
             self.en_th1.bind("<Return>", self._update_mask)
             self.sc_th2.configure(state=tk.DISABLED)
             self.sc_th2.unbind("<ButtonRelease-1>")
