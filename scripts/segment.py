@@ -107,11 +107,10 @@ def merge_masks(bg_mask, pheno_mask):
     :return np.ndarray, 2D mask with background marked as 0, foreground as 1 and
         phenotype area as 2
     """
-    pheno_mask[bg_mask == 0] = 0
-    comb_mask = np.zeros_like(pheno_mask).astype(int)
-    comb_mask[bg_mask == 0] = 0
-    comb_mask[bg_mask == 1] = 1
-    comb_mask[pheno_mask == 1] = 2
+    substep = bg_mask.astype(int) + pheno_mask.astype(int)
+    comb_mask = np.zeros_like(bg_mask)
+    comb_mask[substep == 1] = 2
+    comb_mask[substep == 2] = 1
     return comb_mask
 
 
