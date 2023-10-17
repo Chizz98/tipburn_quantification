@@ -293,8 +293,8 @@ class MainWindow(tk.Tk):
             th1 = float(self.sc_th1.get())
             th2 = float(self.sc_th2.get())
             th3 = float(self.sc_th3.get())
-            self.mask_arr = segment.multichannel_threshold(
-                self.im_arr, th1, th2, th3
+            self.mask_arr = utils.threshold_between(
+                self.im_arr, x_low=th1, y_low=th2, z_low=th3
             )
         self.mask_arr = self.mask_arr.astype(int)
         if self.overlap_masks:
