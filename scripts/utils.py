@@ -48,7 +48,7 @@ def read_fimg(filename):
 
 
 def threshold_between(image, x_low=None, x_high=None, y_low=None, y_high=None,
-                      z_low=None, z_high=None):
+                      z_low=None, z_high=None, and_mask=True):
     """ Thresholds an image array for being between two values for each channels
 
     :param image: np.ndarray, 3d matrix representing the image
@@ -61,6 +61,9 @@ def threshold_between(image, x_low=None, x_high=None, y_low=None, y_high=None,
     :param z_low: low boundary for channel 3. Defaults to minimum of channel 3.
     :param z_high: high boundary for channel 3. Defaults to maximum of channel
         3.
+    :param and_mask: bool, if true returned mask is only true when all
+        thresholds apply. If false returned mask is true if at least one of the
+        thresholds apply.
     """
     # channel x thresholding
     if not x_low:
@@ -80,5 +83,8 @@ def threshold_between(image, x_low=None, x_high=None, y_low=None, y_high=None,
     if not z_high:
         z_high = image[:, :, 2].max()
     z_mask = (image[:, :, 2] >= z_low) & (image[:, :, 2] <= z_high)
-    comp_mask = x_mask & y_mask & z_mask
+    if and_mask:
+        comp_mask = x_mask & y_mask & z_mask
+    else:
+        comp_mask = x_mask | y_mask | z_mask
     return comp_mask
