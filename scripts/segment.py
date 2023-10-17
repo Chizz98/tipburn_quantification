@@ -111,6 +111,7 @@ def merge_masks(bg_mask, pheno_mask):
     comb_mask = np.zeros_like(bg_mask)
     comb_mask[substep == 1] = 2
     comb_mask[substep == 2] = 1
+    comb_mask[bg_mask == 0] = 0
     return comb_mask
 
 
