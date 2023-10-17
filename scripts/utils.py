@@ -22,15 +22,15 @@ def crop_region(image, centre, shape):
     shape_r[shape_r % 2 == 1] += 1
     if image.ndim == 2:
         crop = image[
-                centre[1] - shape_r[1] // 2: centre[1] + shape[1] // 2,
-                centre[0] - shape_r[0] // 2: centre[0] + shape[0] // 2
-        ]
+               centre[1] - shape_r[1] // 2: centre[1] + shape[1] // 2,
+               centre[0] - shape_r[0] // 2: centre[0] + shape[0] // 2
+               ]
     else:
         crop = image[
                centre[1] - shape_r[1] // 2: centre[1] + shape[1] // 2,
                centre[0] - shape_r[0] // 2: centre[0] + shape[0] // 2,
                :
-        ]
+               ]
     return crop
 
 
@@ -46,3 +46,39 @@ def read_fimg(filename):
     image[image < 0] = 0
     return image
 
+
+def threshold_between(image, x_low=None, x_high=None, y_low=None, y_high=None,
+                      z_low=None, z_high=None):
+    """ Thresholds an image array for being between two values for each channels
+
+    :param image: np.ndarray, 3d matrix representing the image
+    :param x_low: low boundary for channel 1. Defaults to minimum of channel 1.
+    :param x_high: high boundary for channel 1. Defaults to maximum of channel
+        1.
+    :param y_low: low boundary for channel 2. Defaults to minimum of channel 2.
+    :param y_high: high boundary for channel 2. Defaults to maximum of channel
+        2.
+    :param z_low: low boundary for channel 3. Defaults to minimum of channel 3.
+    :param z_high: high boundary for channel 3. Defaults to maximum of channel
+        3.
+    """
+    # channel x thresholding
+    if not x_low:
+        x_low = image[:, :, 0].min()
+    if not x_high:
+        x_high = image[:, :, 0].max()
+    x_mask = (image[:, :, 0] >= x_low) & (image[:, :, 0] <= x_high)
+    # channel y thresholding
+    if not y_low:
+        y_low = image[:, :, 1].min()
+    if not y_high:
+        y_high = image[:, :, 1].max()
+    y_mask = (image[:, :, 1] >= y_low) & (image[:, :, 1] <= y_high)
+    # channel z thresholding
+    if not z_low:
+        z_low = image[:, :, 2].min()
+    if not z_high:
+        z_high = image[:, :, 2].max()
+    z_mask = (image[:, :, 2] >= z_low) & (image[:, :, 2] <= z_high)
+    comp_mask = x_mask & y_mask & z_mask
+    return comp_mask
