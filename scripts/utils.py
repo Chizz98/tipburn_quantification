@@ -64,6 +64,7 @@ def threshold_between(image, x_low=None, x_high=None, y_low=None, y_high=None,
     :param and_mask: bool, if true returned mask is only true when all
         thresholds apply. If false returned mask is true if at least one of the
         thresholds apply.
+    :return np.ndarray, binary mask
     """
     # channel x thresholding
     if not x_low:
@@ -88,3 +89,15 @@ def threshold_between(image, x_low=None, x_high=None, y_low=None, y_high=None,
     else:
         comp_mask = x_mask | y_mask | z_mask
     return comp_mask
+
+
+def increase_contrast(im_channel):
+    """ Takes a 2d array and makes its values range from 0 to 1
+
+    :param im_channel: np.ndarray, numpy array with 2 dimensions
+    :return np.ndarray, input channel scaled from 0 to 1.
+    """
+    ch_min = im_channel.min()
+    ch_max = im_channel.max()
+    out = (im_channel - ch_min) / (ch_max - ch_min)
+    return out
