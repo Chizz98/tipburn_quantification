@@ -9,7 +9,7 @@ import argparse as arg
 import os
 import segment
 import matplotlib.pyplot as plt
-from skimage import io, morphology, color
+from skimage import io, morphology, color, util
 import numpy as np
 
 
@@ -63,7 +63,7 @@ def main():
             try:
                 image = io.imread(directory + "/" + file)
                 if image.shape[2] == 4:
-                    image = color.rgba2rgb(image)
+                    image = util.img_as_ubyte(color.rgba2rgb(image))
             except:
                 print(f"Could not open {directory + '/' + file}")
             else:
