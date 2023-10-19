@@ -111,6 +111,7 @@ def multichannel_mask(image, mask):
     :return np.ndarray, masked input image
     """
     mask = mask.astype(image.dtype)
+    image = image.copy()
     image[:, :, 0] *= mask
     image[:, :, 1] *= mask
     image[:, :, 2] *= mask
