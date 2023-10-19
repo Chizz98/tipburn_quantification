@@ -101,3 +101,17 @@ def increase_contrast(im_channel):
     ch_max = im_channel.max()
     out = (im_channel - ch_min) / (ch_max - ch_min)
     return out
+
+
+def multichannel_mask(image, mask):
+    """ Takes an image and applies a mask to every channel
+
+    :param image, np.dnarray, 3 dimensional array representing an image
+    :param mask, np.ndarray, 2d binary mask
+    :return np.ndarray, masked input image
+    """
+    mask = mask.astype(image.dtype)
+    image[:, :, 0] *= mask
+    image[:, :, 1] *= mask
+    image[:, :, 2] *= mask
+    return image
