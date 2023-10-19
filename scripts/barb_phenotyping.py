@@ -1,4 +1,4 @@
-from skimage import io, color, morphology, util
+from skimage import io, color, morphology, util, measure
 import matplotlib.pyplot as plt
 import segment
 import utils
@@ -110,6 +110,12 @@ def main():
                 # Remove edges of mask to prevent border pixel noise
                 footprint = morphology.disk(1)
                 bg_mask = morphology.erosion(bg_mask, footprint=footprint)
+                # Only keep centre object
+                height, width = bg_mask.shape
+                height = height // 2
+                width = width // 2
+                labelled = measure.label(bg_mask)
+                bg_mask = labelled == labelled[height, width]
                 # Create compound array
                 comp_im = barb_hue(rgb_im, bg_mask)
                 # Write image
@@ -121,7 +127,7 @@ def main():
                 ex_round = file_split[1]
                 tray = file_split[2].split("_")[-1]
                 pos = file_split[4].split("_")[1]
-                accession = file_split[4].split("_")[2]
+                accession = file_split[4].split("_")[2].replace(".png", "")
                 healthy = str((comp_im == 1).sum())
                 brown = str((comp_im == 2).sum()) + "\n"
                 out_table.write("\t".join([experiment, ex_round, tray, pos,
