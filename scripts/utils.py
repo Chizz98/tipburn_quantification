@@ -96,7 +96,7 @@ def increase_contrast(im_channel):
     """ Takes a 2d array and makes its values range from 0 to 1
 
     :param im_channel: np.ndarray, numpy array with 2 dimensions
-    :return np.ndarray, input channel scaled from 0 to 1.
+    :return np.ndarray: input channel scaled from 0 to 1.
     """
     ch_min = im_channel.min()
     ch_max = im_channel.max()
@@ -122,9 +122,9 @@ def multichannel_mask(image, mask):
 def canny_labs(image, mask, sigma):
     """ Separates objects trough canny lines and then labels the output
 
-    :param image, np.dnarray, 3 dimensional array representing an image
-    :param mask, np.ndarray, 2d binary mask
-    :param sigma, float, the sigma used for the gaussian blur component of canny
+    :param image: np.dnarray, 2d array representing an image
+    :param mask: np.ndarray, 2d binary mask
+    :param sigma: float, the sigma used for the gaussian blur component of canny
         segmentation
     :return np.ndarray, labelled image
     """
@@ -134,3 +134,15 @@ def canny_labs(image, mask, sigma):
     mask[canny_f == 1] = 0
     labels = measure.label(mask, connectivity=1)
     return labels
+
+
+def centre_primary_label(lab_im, radius=50):
+    """ Takes labelled image and returns the label of the central object
+
+    :param lab_im: np.ndarray, labelled image
+    :param radius: int, radius of the circle mask used on the centre
+    :return: int, primary label
+    """
+    footprint = morphology.disk(radius)
+    centre = (lab_im.shape[0] // 2, lab_im.shape[1] // 2)
+    print(centre)
