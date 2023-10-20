@@ -28,6 +28,13 @@ def arg_reader():
 
 
 def barb_thresh(im_channel):
+    """ Defines the threshold of an image channel based on its histogram
+
+      :param im_channel: np.ndarray, 2d array, meant to be hue channel of hsv or
+          a channel of lab
+      :return float, the threshold of the image channel that separates it into
+          healthy and unhealthy tissue
+    """
     values, bins = np.histogram(im_channel, bins=100)
     peak_i = np.argmax(values)
     val_max = values[peak_i]
@@ -44,6 +51,13 @@ def barb_thresh(im_channel):
 
 
 def barb_hue(image, bg_mask=None):
+    """ Takes an image of plant tissue and segments into healthy and brown
+
+      :param image: np.ndarray, 3d array representing an rgb image
+      :param bg_mask: np.ndarray, 2d array to mask the background
+      :return np.ndarray, mask with background as 0, healthy tissue as 1 and
+          brown tissue as 2
+    """
     if bg_mask is not None:
         # Apply mask to rgb_im
         rgb_im = utils.multichannel_mask(image, bg_mask)
