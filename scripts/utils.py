@@ -139,10 +139,10 @@ def canny_labs(image, mask, sigma):
 def centre_primary_label(lab_im, radius=50):
     """ Takes labelled image and returns the label of the central object
 
-    :param lab_im: np.ndarray, labelled image
-    :param radius: int, radius of the circle mask used on the centre
+    :param lab_im: np.ndarray, labelled image with only positive values and 0
+    :param radius: int, height and width of the square used on the centre
     :return: int, primary label
     """
-    footprint = morphology.disk(radius)
     centre = (lab_im.shape[0] // 2, lab_im.shape[1] // 2)
-    print(centre)
+    crop = crop_region(lab_im, centre, (radius, radius))
+    return np.argmax(np.bincount(crop.ravel()))
