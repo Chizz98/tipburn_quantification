@@ -1,4 +1,4 @@
-from skimage import io, color, morphology, util, measure
+from skimage import io, color, morphology, util, measure, feature
 import matplotlib.pyplot as plt
 import segment
 import utils
@@ -20,31 +20,10 @@ def arg_reader():
     arg_parser.add_argument("out", help="The directory to write the files "
                                         "to. Does not need to be "
                                         "pre_existing. ../out as default.")
-    arg_parser.add_argument(
-        "seeds",
-        help="The number of starting seeds for the watershed segmentation",
-        type=int
-    )
-    arg_parser.add_argument(
-        "-ht",
-        help="The hue threshold, every pixel where the hue is below this will "
-             "be marked as 0. Hue is given in a range between 0 and 1.",
-        type=float, default=0.0
-    )
-    arg_parser.add_argument(
-        "-st",
-        help="The saturation threshold, every pixel where the saturation is "
-             "below this will be marked as 0. Saturation is given in a range "
-             "between 0 and 1.",
-        type=float, default=0.0
-    )
-    arg_parser.add_argument(
-        "-vt",
-        help="the value threshold, every pixel where the value will be below"
-             "this threshold will be marked as 0. Saturation is given between 0"
-             "and 1",
-        type=float, default=0.0
-    )
+    arg_parser.add_argument("-s", help="Sigma used for canny edge detection. "
+                                       "Used to remove high contrast bordering"
+                                       "objects.",
+                            type=float, default=3.0)
     return arg_parser.parse_args()
 
 
@@ -103,24 +82,31 @@ def main():
                 print(f"Could not open {directory + '/' + file}")
             else:
                 # Create bg_mask
-                bg_mask = segment.water_hsv_thresh(rgb_im, 2000, s_th=0.25,
-                                                   v_th=0.2)
-                bg_mask = morphology.remove_small_holes(bg_mask,
-                                                        area_threshold=3)
-                # Remove edges of mask to prevent border pixel noise
-                footprint = morphology.disk(1)
-                bg_mask = morphology.erosion(bg_mask, footprint=footprint)
+                bg_mask = segment.sw_segmentation(rgb_im)
                 # Only keep centre object
                 height, width = bg_mask.shape
                 height = height // 2
                 width = width // 2
-                labelled = measure.label(bg_mask)
+                labelled = utils.canny_labs(color.rgb2gray(rgb_im), bg_mask,
+                                            args.s)
                 bg_mask = labelled == labelled[height, width]
+                # Remove canny lines
+                bg_mask = morphology.closing(bg_mask,
+                                             footprint=morphology.disk(10))
+                bg_mask = morphology.opening(bg_mask, footprint=np.ones((2, 10)))
+                bg_mask = morphology.opening(bg_mask, footprint=np.ones((10, 2)))
                 # Create compound array
                 comp_im = barb_hue(rgb_im, bg_mask)
                 # Write image
-                plt.imsave(args.out + "/" + file.replace(".png", "_comp.png"),
-                           arr=comp_im)
+                bg = utils.multichannel_mask(rgb_im, comp_im == 0)
+                fg = utils.multichannel_mask(rgb_im, comp_im > 0)
+                tb = utils.multichannel_mask(rgb_im, comp_im == 2)
+                plt.imsave(args.out + "/" + file.replace(".png", "_bg.png"),
+                           arr=bg)
+                plt.imsave(args.out + "/" + file.replace(".png", "_fg.png"),
+                           arr=fg)
+                plt.imsave(args.out + "/" + file.replace(".png", "_tb.png"),
+                           arr=tb)
                 # Write table
                 file_split = file.split("-")
                 experiment = file_split[0]
