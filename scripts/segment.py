@@ -97,6 +97,23 @@ def water_hsv_thresh(rgb_im, n_seeds, h_th=0.0, s_th=0.0, v_th=0.0):
     return mask.astype(int)
 
 
+def sw_segmentation(image):
+    """ Separates an image from the background with sobel filtering + watershed
+
+    :param image: np.ndarray representing a 3d image
+    :return np.ndarray, 2D mask for the image
+    """
+    comp_sob = filters.sobel(image)
+    comp_sob = comp_sob[:, :, 0] + comp_sob[:, :, 1] + comp_sob[:, :, 2]
+    elevation = filters.sobel(comp_sob)
+    markers = np.zeros_like(comp_sob)
+    markers[comp_sob <= 0.025] = 1
+    markers[comp_sob >= 0.15] = 2
+    mask = segmentation.watershed(elevation, markers)
+    mask = morphology.erosion(mask, footprint=morphology.disk(2))
+    return mask
+
+
 def merge_masks(bg_mask, pheno_mask):
     """ Merges 2 binary masks into one mask, where phenotype has high values
 

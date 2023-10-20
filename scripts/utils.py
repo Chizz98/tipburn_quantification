@@ -6,6 +6,7 @@ Date: 11/10/2023
 Utility functions for image analysis
 """
 import numpy as np
+from skimage import feature, measure, morphology
 
 
 def crop_region(image, centre, shape):
@@ -116,3 +117,12 @@ def multichannel_mask(image, mask):
     image[:, :, 1] *= mask
     image[:, :, 2] *= mask
     return image
+
+
+def canny_labs(image, mask, sigma):
+    canny_f = feature.canny(image, sigma=sigma)
+    canny_f = morphology.dilation(canny_f)
+    mask = mask.copy()
+    mask[canny_f == 1] = 0
+    labels = measure.label(mask, connectivity=1)
+    return labels
