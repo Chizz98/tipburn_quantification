@@ -120,6 +120,14 @@ def multichannel_mask(image, mask):
 
 
 def canny_labs(image, mask, sigma):
+    """ Separates objects trough canny lines and then labels the output
+
+    :param image, np.dnarray, 3 dimensional array representing an image
+    :param mask, np.ndarray, 2d binary mask
+    :param sigma, float, the sigma used for the gaussian blur component of canny
+        segmentation
+    :return np.ndarray, labelled image
+    """
     canny_f = feature.canny(image, sigma=sigma)
     canny_f = morphology.dilation(canny_f)
     mask = mask.copy()
