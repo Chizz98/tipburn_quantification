@@ -6,7 +6,7 @@ Date: 11/10/2023
 Utility functions for image analysis
 """
 import numpy as np
-from skimage import feature, measure, morphology
+from skimage import feature, measure, morphology, color
 
 
 def crop_region(image, centre, shape):
@@ -146,3 +146,34 @@ def centre_primary_label(lab_im, radius=50):
     centre = (lab_im.shape[0] // 2, lab_im.shape[1] // 2)
     crop = crop_region(lab_im, centre, (radius, radius))
     return np.argmax(np.bincount(crop.ravel()))
+
+
+def canny_central_ob(image, mask, sigma):
+    """ Uses canny filter and color channel thresholding to take central object
+
+    :param image: np.ndarray, 3d array representing rgb image
+    :param mask: np.ndarray, 2d boolean array representing background mask
+    :param sigma: float, sigma used for gaussian blur step of canny edge
+        detection
+    :return np.ndarray, 2d binary mask of central object
+    """
+    bg_labs = measure.label(mask)
+    mask = bg_labs == centre_primary_label(bg_labs, 10)
+    canny_labelled = canny_labs(color.rgb2gray(image), mask, sigma)
+    prim_lab = centre_primary_label(canny_labelled, 10)
+    average_cols = color.label2rgb(canny_labelled, image, kind="avg")
+    average_cols = color.rgb2hsv(average_cols)
+    prim_area = multichannel_mask(average_cols, canny_labelled == prim_lab)
+    h_main = np.unique(prim_area[:, :, 0])[1]
+    s_main = np.unique(prim_area[:, :, 1])[1]
+    v_main = np.unique(prim_area[:, :, 2])[1]
+    mask = threshold_between(
+        image=average_cols,
+        x_low=h_main - 0.2, x_high=h_main + 0.2,
+        y_low=s_main - 0.2, y_high=s_main + 0.2,
+        z_low=v_main - 0.2, z_high=v_main + 0.2
+    )
+    mask = morphology.closing(mask, footprint=morphology.disk(3))
+    mask = morphology.remove_small_holes(mask, area_threshold=150)
+    return mask
+
