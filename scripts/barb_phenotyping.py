@@ -98,17 +98,12 @@ def main():
                 # Create bg_mask
                 bg_mask = segment.sw_segmentation(rgb_im)
                 # Only keep centre object
-                height, width = bg_mask.shape
-                height = height // 2
-                width = width // 2
-                labelled = utils.canny_labs(color.rgb2gray(rgb_im), bg_mask,
-                                            args.s)
-                bg_mask = labelled == labelled[height, width]
-                # Remove canny lines
-                bg_mask = morphology.closing(bg_mask,
-                                             footprint=morphology.disk(10))
-                bg_mask = morphology.opening(bg_mask, footprint=np.ones((2, 10)))
-                bg_mask = morphology.opening(bg_mask, footprint=np.ones((10, 2)))
+                bg_mask = utils.canny_central_ob(rgb_im, bg_mask, 3)
+                # Remove straight line artefacts
+                bg_mask = morphology.opening(bg_mask,
+                                             footprint=np.ones((2, 10)))
+                bg_mask = morphology.opening(bg_mask,
+                                             footprint=np.ones((10, 2)))
                 # Create compound array
                 comp_im = barb_hue(rgb_im, bg_mask)
                 # Write image
@@ -132,7 +127,7 @@ def main():
                 brown = str((comp_im == 2).sum()) + "\n"
                 out_table.write("\t".join([experiment, ex_round, tray, pos,
                                            accession, healthy, brown]))
-        out_table.close()
+    out_table.close()
 
 
 if __name__ == "__main__":
