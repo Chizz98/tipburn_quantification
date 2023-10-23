@@ -96,7 +96,7 @@ def main():
                 print(f"Could not open {directory + '/' + file}")
             else:
                 # Create bg_mask
-                bg_mask = segment.sw_segmentation(rgb_im)
+                bg_mask = segment.shw_segmentation(rgb_im)
                 # Only keep centre object
                 bg_mask = utils.canny_central_ob(rgb_im, bg_mask, 3)
                 # Remove lines
