@@ -7,6 +7,7 @@ Contains functions for segmenting RGB images
 """
 from skimage import io, color, filters, segmentation, util, morphology
 import numpy as np
+from scipy import signal
 
 
 def elevation_map(rgb_im):
@@ -109,6 +110,29 @@ def sw_segmentation(image):
     markers = np.zeros_like(comp_sob)
     markers[comp_sob <= 0.025] = 1
     markers[comp_sob >= 0.175] = 2
+    mask = segmentation.watershed(elevation, markers)
+    mask = morphology.erosion(mask, footprint=morphology.disk(2))
+    return mask
+
+
+def shw_segmentation(image):
+    """ Creates binary image through sobel + histogram thresholds + watershed
+
+    :param image: np.ndarray representing a 3d image
+    :return np.ndarray, 2D mask for the image
+    """
+    comp_sob = filters.sobel(image)
+    comp_sob = comp_sob[:, :, 0] + comp_sob[:, :, 1] + comp_sob[:, :, 2]
+    elevation = filters.sobel(comp_sob)
+    values, bins = np.histogram(comp_sob, bins=100)
+    max_i = signal.argrelmax(values, order=10)
+    max_bins = bins[max_i]
+    min_i = signal.argrelmin(values, order=10)
+    min_bins = bins[min_i]
+    min_bins = min_bins[min_bins > max_bins[0]]
+    markers = np.zeros_like(comp_sob)
+    markers[comp_sob <= max_bins[0] + (0.15 * (min_bins[0] - max_bins[0]))] = 1
+    markers[comp_sob >= min_bins[0] + (0.2 * (max_bins[1] - min_bins[0]))] = 2
     mask = segmentation.watershed(elevation, markers)
     mask = morphology.erosion(mask, footprint=morphology.disk(2))
     return mask
