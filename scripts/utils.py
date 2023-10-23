@@ -145,7 +145,7 @@ def centre_primary_label(lab_im, radius=50):
     """
     centre = (lab_im.shape[0] // 2, lab_im.shape[1] // 2)
     crop = crop_region(lab_im, centre, (radius, radius))
-    return np.argmax(np.bincount(crop.ravel()))
+    return np.argmax(np.bincount(crop[crop > 0].ravel()))
 
 
 def canny_central_ob(image, mask, sigma):
@@ -158,9 +158,9 @@ def canny_central_ob(image, mask, sigma):
     :return np.ndarray, 2d binary mask of central object
     """
     bg_labs = measure.label(mask)
-    mask = bg_labs == centre_primary_label(bg_labs, 10)
+    mask = bg_labs == centre_primary_label(bg_labs)
     canny_labelled = canny_labs(color.rgb2gray(image), mask, sigma)
-    prim_lab = centre_primary_label(canny_labelled, 10)
+    prim_lab = centre_primary_label(canny_labelled)
     average_cols = color.label2rgb(canny_labelled, image, kind="avg")
     average_cols = color.rgb2hsv(average_cols)
     prim_area = multichannel_mask(average_cols, canny_labelled == prim_lab)

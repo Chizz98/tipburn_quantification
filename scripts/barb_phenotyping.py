@@ -99,11 +99,11 @@ def main():
                 bg_mask = segment.sw_segmentation(rgb_im)
                 # Only keep centre object
                 bg_mask = utils.canny_central_ob(rgb_im, bg_mask, 3)
-                # Remove straight line artefacts
+                # Remove lines
                 bg_mask = morphology.opening(bg_mask,
-                                             footprint=np.ones((2, 10)))
+                                             footprint=np.ones((5, 10)))
                 bg_mask = morphology.opening(bg_mask,
-                                             footprint=np.ones((10, 2)))
+                                             footprint=np.ones((10, 5)))
                 # Create compound array
                 comp_im = barb_hue(rgb_im, bg_mask)
                 # Write image

@@ -108,7 +108,7 @@ def sw_segmentation(image):
     elevation = filters.sobel(comp_sob)
     markers = np.zeros_like(comp_sob)
     markers[comp_sob <= 0.025] = 1
-    markers[comp_sob >= 0.15] = 2
+    markers[comp_sob >= 0.175] = 2
     mask = segmentation.watershed(elevation, markers)
     mask = morphology.erosion(mask, footprint=morphology.disk(2))
     return mask
