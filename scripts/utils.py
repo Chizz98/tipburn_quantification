@@ -136,7 +136,7 @@ def canny_labs(image, mask, sigma):
     return labels
 
 
-def centre_primary_label(lab_im, radius=50):
+def centre_primary_label(lab_im, radius=200):
     """ Takes labelled image and returns the label of the central object
 
     :param lab_im: np.ndarray, labelled image with only positive values and 0
