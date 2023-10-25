@@ -96,37 +96,49 @@ def main():
                 print(f"Could not open {directory + '/' + file}")
             else:
                 # Create bg_mask
-                bg_mask = segment.shw_segmentation(rgb_im)
-                # Only keep centre object
-                bg_mask = utils.canny_central_ob(rgb_im, bg_mask, 3)
-                # Remove lines
-                bg_mask = morphology.opening(bg_mask,
-                                             footprint=np.ones((5, 10)))
-                bg_mask = morphology.opening(bg_mask,
-                                             footprint=np.ones((10, 5)))
-                # Create compound array
-                comp_im = barb_hue(rgb_im, bg_mask)
-                # Write image
-                bg = utils.multichannel_mask(rgb_im, comp_im == 0)
-                fg = utils.multichannel_mask(rgb_im, comp_im > 0)
-                tb = utils.multichannel_mask(rgb_im, comp_im == 2)
-                plt.imsave(args.out + "/" + file.replace(".png", "_bg.png"),
-                           arr=bg)
-                plt.imsave(args.out + "/" + file.replace(".png", "_fg.png"),
-                           arr=fg)
-                plt.imsave(args.out + "/" + file.replace(".png", "_tb.png"),
-                           arr=tb)
-                # Write table
-                file_split = file.split("-")
-                experiment = file_split[0]
-                ex_round = file_split[1]
-                tray = file_split[2].split("_")[-1]
-                pos = file_split[4].split("_")[1]
-                accession = file_split[4].split("_")[2].replace(".png", "")
-                healthy = str((comp_im == 1).sum())
-                brown = str((comp_im == 2).sum()) + "\n"
-                out_table.write("\t".join([experiment, ex_round, tray, pos,
-                                           accession, healthy, brown]))
+                try:
+                    bg_mask = segment.shw_segmentation(rgb_im)
+                except:
+                    print(f"Could not segment foreground from background in "
+                          f"{directory + '/' + file}")
+                    out_table.write("\t".join(["NA"] * 7))
+                else:
+                    # Only keep centre object
+                    bg_mask = utils.canny_central_ob(rgb_im, bg_mask, 3)
+                    # Remove lines
+                    bg_mask = morphology.opening(bg_mask,
+                                                 footprint=np.ones((5, 10)))
+                    bg_mask = morphology.opening(bg_mask,
+                                                 footprint=np.ones((10, 5)))
+                    # Create compound array
+                    try:
+                        comp_im = barb_hue(rgb_im, bg_mask)
+                    except:
+                        print(f"Could not segment healthy from brown in"
+                              f"{directory + '/' + file}")
+                        out_table.write("\t".join(["NA"] * 7))
+                    else:
+                        # Write image
+                        bg = utils.multichannel_mask(rgb_im, comp_im == 0)
+                        fg = utils.multichannel_mask(rgb_im, comp_im > 0)
+                        tb = utils.multichannel_mask(rgb_im, comp_im == 2)
+                        plt.imsave(args.out + "/" + file.replace(".png", "_bg.png"),
+                                   arr=bg)
+                        plt.imsave(args.out + "/" + file.replace(".png", "_fg.png"),
+                                   arr=fg)
+                        plt.imsave(args.out + "/" + file.replace(".png", "_tb.png"),
+                                   arr=tb)
+                        # Write table
+                        file_split = file.split("-")
+                        experiment = file_split[0]
+                        ex_round = file_split[1]
+                        tray = file_split[2].split("_")[-1]
+                        pos = file_split[4].split("_")[1]
+                        accession = file_split[4].split("_")[2].replace(".png", "")
+                        healthy = str((comp_im == 1).sum())
+                        brown = str((comp_im == 2).sum()) + "\n"
+                        out_table.write("\t".join([experiment, ex_round, tray, pos,
+                                                   accession, healthy, brown]))
     out_table.close()
 
 
