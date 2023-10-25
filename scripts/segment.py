@@ -135,7 +135,7 @@ def shw_segmentation(image):
     markers[comp_sob >= min_bins[0] + (0.2 * (max_bins[1] - min_bins[0]))] = 2
     mask = segmentation.watershed(elevation, markers)
     mask = morphology.erosion(mask, footprint=morphology.disk(2))
-    return mask
+    return mask - 1
 
 
 def merge_masks(bg_mask, pheno_mask):
