@@ -125,9 +125,9 @@ def shw_segmentation(image):
     comp_sob = comp_sob[:, :, 0] + comp_sob[:, :, 1] + comp_sob[:, :, 2]
     elevation = filters.sobel(comp_sob)
     values, bins = np.histogram(comp_sob, bins=100)
-    max_i = signal.argrelmax(values, order=10)
+    max_i, _ = signal.find_peaks(values, distance=10)
     max_bins = bins[max_i]
-    min_i = signal.argrelmin(values, order=10)
+    min_i, _ = signal.find_peaks(-values, distance=10)
     min_bins = bins[min_i]
     min_bins = min_bins[min_bins > max_bins[0]]
     markers = np.zeros_like(comp_sob)
