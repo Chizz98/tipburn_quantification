@@ -129,12 +129,13 @@ def canny_labs(image, mask, sigma):
     :return np.ndarray, labelled image
     """
     canny_f = feature.canny(image, sigma=sigma)
-    canny_f = morphology.dilation(canny_f)
+    canny_f = morphology.closing(canny_f, footprint=np.ones((1, 10)))
+    canny_f = morphology.closing(canny_f, footprint=np.ones((10, 1)))
+    canny_f = morphology.skeletonize(canny_f)
     mask = mask.copy()
     mask[canny_f == 1] = 0
     labels = measure.label(mask, connectivity=1)
     return labels
-
 
 def centre_primary_label(lab_im, radius=200):
     """ Takes labelled image and returns the label of the central object
@@ -169,9 +170,9 @@ def canny_central_ob(image, mask, sigma):
     v_main = np.unique(prim_area[:, :, 2])[1]
     mask = threshold_between(
         image=average_cols,
-        x_low=h_main - 0.2, x_high=h_main + 0.2,
-        y_low=s_main - 0.2, y_high=s_main + 0.2,
-        z_low=v_main - 0.2, z_high=v_main + 0.2
+        x_low=h_main - 0.1, x_high=h_main + 0.1,
+        y_low=s_main - 0.25, y_high=s_main + 0.25,
+        z_low=v_main - 0.25, z_high=v_main + 0.25
     )
     mask = morphology.closing(mask, footprint=morphology.disk(3))
     mask = morphology.remove_small_holes(mask, area_threshold=150)
