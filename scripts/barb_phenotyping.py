@@ -101,7 +101,7 @@ def main():
                 except:
                     print(f"Could not segment foreground from background in "
                           f"{directory + '/' + file}")
-                    out_table.write("\t".join(["NA"] * 7))
+                    out_table.write("\t".join(["NA"] * 7) + "\n")
                 else:
                     # Only keep centre object
                     bg_mask = utils.canny_central_ob(rgb_im, bg_mask, 3)
@@ -116,7 +116,7 @@ def main():
                     except:
                         print(f"Could not segment healthy from brown in"
                               f"{directory + '/' + file}")
-                        out_table.write("\t".join(["NA"] * 7))
+                        out_table.write("\t".join(["NA"] * 7) + "\n")
                     else:
                         # Write image
                         bg = utils.multichannel_mask(rgb_im, comp_im == 0)
