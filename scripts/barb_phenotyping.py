@@ -104,7 +104,7 @@ def main():
                     out_table.write("\t".join(["NA"] * 7) + "\n")
                 else:
                     # Only keep centre object
-                    bg_mask = utils.canny_central_ob(rgb_im, bg_mask, 3)
+                    bg_mask = utils.canny_central_ob(rgb_im, bg_mask, args.s)
                     # Remove lines
                     bg_mask = morphology.opening(bg_mask,
                                                  footprint=np.ones((5, 10)))
@@ -122,12 +122,15 @@ def main():
                         bg = utils.multichannel_mask(rgb_im, comp_im == 0)
                         fg = utils.multichannel_mask(rgb_im, comp_im > 0)
                         tb = utils.multichannel_mask(rgb_im, comp_im == 2)
-                        plt.imsave(args.out + "/" + file.replace(".png", "_bg.png"),
-                                   arr=bg)
-                        plt.imsave(args.out + "/" + file.replace(".png", "_fg.png"),
-                                   arr=fg)
-                        plt.imsave(args.out + "/" + file.replace(".png", "_tb.png"),
-                                   arr=tb)
+                        plt.imsave(
+                            args.out + "/" + file.replace(".png", "_bg.png"),
+                            arr=bg)
+                        plt.imsave(
+                            args.out + "/" + file.replace(".png", "_fg.png"),
+                            arr=fg)
+                        plt.imsave(
+                            args.out + "/" + file.replace(".png", "_tb.png"),
+                            arr=tb)
                         # Write table
                         file_split = file.split("-")
                         experiment = file_split[0]
