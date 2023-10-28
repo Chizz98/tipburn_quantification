@@ -137,16 +137,18 @@ def canny_labs(image, mask, sigma):
     labels = measure.label(mask, connectivity=1)
     return labels
 
-def centre_primary_label(lab_im, radius=200):
+def centre_primary_label(lab_im, radius=200, bg_label=0):
     """ Takes labelled image and returns the label of the central object
 
     :param lab_im: np.ndarray, labelled image with only positive values and 0
     :param radius: int, height and width of the square used on the centre
+    :param bg_label: int, the label number that will be considered background.
+        This can not be chosen as the primary label.
     :return: int, primary label
     """
     centre = (lab_im.shape[0] // 2, lab_im.shape[1] // 2)
     crop = crop_region(lab_im, centre, (radius, radius))
-    return np.argmax(np.bincount(crop[crop > 0].ravel()))
+    return np.argmax(np.bincount(crop[crop != bg_label].ravel()))
 
 
 def canny_central_ob(image, mask, sigma):
