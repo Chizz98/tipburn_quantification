@@ -24,6 +24,12 @@ def arg_reader():
                                        "Used to remove high contrast bordering"
                                        "objects.",
                             type=float, default=3.0)
+    arg_parser.add_argument("-d", help="Distance metric used to merge adjacent "
+                                       "objects. The lower this number the more"
+                                       " similar objects need to be to the "
+                                       "central object to get included in the"
+                                       "central object. Default is 100.",
+                            type=int, default=100)
     return arg_parser.parse_args()
 
 
@@ -137,11 +143,13 @@ def main():
                         ex_round = file_split[1]
                         tray = file_split[2].split("_")[-1]
                         pos = file_split[4].split("_")[1]
-                        accession = file_split[4].split("_")[2].replace(".png", "")
+                        accession = file_split[4].split("_")[2].replace(".png",
+                                                                        "")
                         healthy = str((comp_im == 1).sum())
                         brown = str((comp_im == 2).sum()) + "\n"
-                        out_table.write("\t".join([experiment, ex_round, tray, pos,
-                                                   accession, healthy, brown]))
+                        out_table.write(
+                            "\t".join([experiment, ex_round, tray, pos,
+                                       accession, healthy, brown]))
     out_table.close()
 
 

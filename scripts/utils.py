@@ -6,7 +6,7 @@ Date: 11/10/2023
 Utility functions for image analysis
 """
 import numpy as np
-from skimage import feature, measure, morphology, color
+from skimage import feature, measure, morphology, color, graph
 
 
 def crop_region(image, centre, shape):
@@ -137,6 +137,7 @@ def canny_labs(image, mask, sigma):
     labels = measure.label(mask, connectivity=1)
     return labels
 
+
 def centre_primary_label(lab_im, radius=200, bg_label=0):
     """ Takes labelled image and returns the label of the central object
 
@@ -180,3 +181,24 @@ def canny_central_ob(image, mask, sigma):
     mask = morphology.remove_small_holes(mask, area_threshold=150)
     return mask
 
+
+def canny_rag_cen(image, mask, sigma, rag_thresh=40):
+    """ Uses canny filter and color channel thresholding to take central object
+
+    :param image: np.ndarray, 3d array representing rgb image
+    :param mask: np.ndarray, 2d boolean array representing background mask
+    :param sigma: float, sigma used for gaussian blur step of canny edge
+        detection
+    :param rag_thresh, float, threshold used for rag merging
+    :return np.ndarray, 2d binary mask of central object
+    """
+    bg_labs = measure.label(mask)
+    mask = bg_labs == centre_primary_label(bg_labs)
+    canny_labelled = canny_labs(color.rgb2gray(image), mask, sigma)
+    rag = graph.rag_mean_color(image, canny_labelled, connectivity=1)
+    labels_rag = graph.cut_threshold(canny_labelled, rag, rag_thresh) + 1
+    labels_rag[mask == 0] = 0
+    out_mask = labels_rag == centre_primary_label(labels_rag,
+                                                  bg_label=0)
+    out_mask = morphology.closing(out_mask)
+    return out_mask

@@ -21,6 +21,9 @@ def arg_reader():
                                         "pre_existing.")
     arg_parser.add_argument("trayfile", help="The .csv containing the plant "
                                              "positions on each tray")
+    arg_parser.add_argument("-v", "--vocal", help="Makes script print progress",
+                            action="store_true"
+                            )
     return arg_parser.parse_args()
 
 
@@ -62,10 +65,13 @@ def main():
     args = arg_reader()
     acc_inf = parse_trayfile(args.trayfile)
     tray_pattern = re.compile(r"Tray_0(\d+)")
+    filecount = 0
     if not os.path.isdir(args.out):
         os.mkdir(args.out)
     if os.path.isdir(args.filename):
-        files = os.listdir(args.filename)
+        files = [file for file in os.listdir(args.filename) if
+                 file.find("Original") != -1 and file.startswith("51-33")]
+        tot_files = len(files)
         for file in files:
             try:
                 image = io.imread(args.filename + "/" + file)
@@ -87,6 +93,9 @@ def main():
                     out_fn = args.out + "/" + file.replace(
                         ".png", f"_pos{pos}_{acc}.png")
                     plt.imsave(fname=out_fn, arr=crop)
+            if args.vocal:
+                filecount += 1
+                print(f"File {filecount} of {tot_files}")
 
 
 if __name__ == "__main__":
