@@ -6,7 +6,7 @@ Date: 11/10/2023
 Utility functions for image analysis
 """
 import numpy as np
-from skimage import feature, measure, morphology, color, graph
+from skimage import feature, measure, morphology, color, graph, segmentation
 
 
 def crop_region(image, centre, shape):
@@ -129,13 +129,17 @@ def canny_labs(image, mask, sigma):
     :return np.ndarray, labelled image
     """
     canny_f = feature.canny(image, sigma=sigma)
-    canny_f = morphology.closing(canny_f, footprint=np.ones((1, 10)))
-    canny_f = morphology.closing(canny_f, footprint=np.ones((10, 1)))
+    canny_f = morphology.closing(
+        canny_f, footprint=morphology.disk(radius=min(image.shape)//500)
+    )
     canny_f = morphology.skeletonize(canny_f)
     mask = mask.copy()
     mask[canny_f == 1] = 0
+    mask = morphology.remove_small_objects(
+        mask, min_size=mask.shape[0] * mask.shape[1] // 10000
+    )
     labels = measure.label(mask, connectivity=1)
-    return labels
+    return morphology.dilation(labels)
 
 
 def centre_primary_label(lab_im, radius=200, bg_label=0):
@@ -202,3 +206,31 @@ def canny_rag_cen(image, mask, sigma, rag_thresh=40):
                                                   bg_label=0)
     out_mask = morphology.closing(out_mask)
     return out_mask
+
+
+def paint_col(image, mask, color_tuple):
+    image = image.copy()
+    image[:, :, 0][mask == 0] = color_tuple[0]
+    image[:, :, 1][mask == 0] = color_tuple[1]
+    image[:, :, 2][mask == 0] = color_tuple[2]
+    return image
+
+
+def slic_central(image, mask):
+    """ Uses canny filter and color channel thresholding to take central object
+
+    :param image: np.ndarray, 3d array representing rgb image
+    :param mask: np.ndarray, 2d boolean array representing background mask
+    :return np.ndarray, 2d binary mask of central object
+    """
+    slic_labs = segmentation.slic(
+        image=image,
+        n_segments=mask.shape[0] * mask.shape[1] // 8000,
+        compactness=10
+    )
+    image = paint_col(image, mask, (255, 255, 255))
+    rag = graph.rag_mean_color(image, slic_labs, connectivity=1)
+    merged_labs = graph.cut_threshold(slic_labs, rag, 50)
+    merged_labs[mask == 0] = 0
+    central_lab = merged_labs == centre_primary_label(merged_labs)
+    return central_lab
