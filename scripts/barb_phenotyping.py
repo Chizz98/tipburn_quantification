@@ -24,12 +24,6 @@ def arg_reader():
                                        "Used to remove high contrast bordering"
                                        "objects.",
                             type=float, default=3.0)
-    arg_parser.add_argument("-d", help="Distance metric used to merge adjacent "
-                                       "objects. The lower this number the more"
-                                       " similar objects need to be to the "
-                                       "central object to get included in the"
-                                       "central object. Default is 100.",
-                            type=int, default=100)
     return arg_parser.parse_args()
 
 
