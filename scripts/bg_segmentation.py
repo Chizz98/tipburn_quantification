@@ -1,5 +1,5 @@
+#!/usr/bin/env python3
 import os
-
 import segment
 import utils
 from skimage import io, util, color, morphology
