@@ -75,7 +75,8 @@ def segment_file(arg_tup):
                 out_fn = outfile + "/diagnostic/" + filename.split("/")[-1]
                 plt.imsave(
                     fname=out_fn.replace(".png", "_bg.png"),
-                    arr=segmentation.mark_boundaries(rgb_im, bg_mask)
+                    arr=segmentation.mark_boundaries(rgb_im, bg_mask,
+                                                     color=(7, 234, 250))
                 )
 
 
