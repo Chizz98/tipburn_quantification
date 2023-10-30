@@ -45,6 +45,7 @@ def segment_file(arg_tup):
     :return: np.ndarray, binary segmentation of the image.
     """
     filename, outfile, sigma, diagnostic = arg_tup
+    print(f"Starting bg_segmentation of {filename}")
     out_fn = outfile + "/" + filename.split("/")[-1]
     try:
         rgb_im = io.imread(filename)
