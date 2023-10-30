@@ -2,11 +2,11 @@
 import os
 import segment
 import utils
-from skimage import io, util, color, morphology
-import matplotlib.pyplot as plt
+from skimage import io, util, color, morphology, segmentation
 from multiprocessing import Pool
 import numpy as np
 import argparse as arg
+import matplotlib.pyplot as plt
 
 
 def arg_reader():
@@ -29,20 +29,22 @@ def arg_reader():
     arg_parser.add_argument("-c", help="Cores used for multiprocessing, 1 by "
                                        "default",
                             type=int, default=1)
+    arg_parser.add_argument("-d", help="If this flag is set, a subdirectory "
+                                       "will be made in out directory that "
+                                       "contains RGB images with the outline "
+                                       "of the mask overlayed.",
+                            action="store_true")
     return arg_parser.parse_args()
 
 
 def segment_file(arg_tup):
     """ Reads an image file and segments foreground from background
 
-    :param filename: str, the path to the file to be read
-    :param outfile: str, the directory in which the masks will be saved, has to
-        be pre-existing
-    :param sigma: float, the sigma used for canny edge detection based object
-        separation
+    :return arg_tup: tuple, contains all parameters in order filename, outfile,
+        sigma
     :return: np.ndarray, binary segmentation of the image.
     """
-    filename, outfile, sigma = arg_tup
+    filename, outfile, sigma, diagnostic = arg_tup
     out_fn = outfile + "/" + filename.split("/")[-1]
     try:
         rgb_im = io.imread(filename)
@@ -63,14 +65,18 @@ def segment_file(arg_tup):
             bg_mask = morphology.opening(bg_mask,
                                          footprint=np.ones((10, 5)))
             plt.imsave(
-                fname=out_fn.replace(".png", "_fg.png"),
-                arr=utils.multichannel_mask(rgb_im, bg_mask)
-            )
-
-            plt.imsave(
                 fname=out_fn.replace(".png", "_bg.png"),
-                arr=utils.multichannel_mask(rgb_im, bg_mask == 0)
+                arr=bg_mask,
+                cmap="binary_r"
             )
+            if diagnostic:
+                if not os.path.isdir(outfile + "/diagnostic"):
+                    os.mkdir(outfile + "/diagnostic")
+                out_fn = outfile + "/diagnostic/" + filename.split("/")[-1]
+                plt.imsave(
+                    fname=out_fn.replace(".png", "_bg.png"),
+                    arr=segmentation.mark_boundaries(rgb_im, bg_mask)
+                )
 
 
 def pool_handler(cores, fun, params):
@@ -86,7 +92,10 @@ def main():
         os.mkdir(args.out)
     # Create list of files
     files = [args.filename + "/" + file for file in os.listdir(args.filename)]
-    param_list = zip(files, [args.out] * len(files), [args.s] * len(files))
+    param_list = zip(
+        files, [args.out] * len(files),
+        [args.s] * len(files),
+        [args.d] * len(files))
     pool_handler(args.c, segment_file, param_list)
 
 
