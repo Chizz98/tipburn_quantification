@@ -49,12 +49,13 @@ def segment_file(arg_tup):
         if rgb_im.shape[2] == 4:
             rgb_im = util.img_as_ubyte(color.rgba2rgb(rgb_im))
     except:
-        print(f"Could not open {filename}")
+        raise Exception(f"Could not open {filename}")
     else:
         try:
             bg_mask = segment.shw_segmentation(rgb_im)
         except:
-            print(f"Could not segment foreground from background in {filename}")
+            raise Exception(f"Could not segment foreground from background in "
+                            f"{filename}")
         else:
             bg_mask = utils.canny_central_ob(rgb_im, bg_mask, sigma)
             bg_mask = morphology.opening(bg_mask,
