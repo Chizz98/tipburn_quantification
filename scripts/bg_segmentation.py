@@ -52,13 +52,12 @@ def segment_file(arg_tup):
         if rgb_im.shape[2] == 4:
             rgb_im = util.img_as_ubyte(color.rgba2rgb(rgb_im))
     except:
-        raise Exception(f"Could not open {filename}")
+        print(f"Could not open {filename}")
     else:
         try:
             bg_mask = segment.shw_segmentation(rgb_im)
         except:
-            raise Exception(f"Could not segment foreground from background in "
-                            f"{filename}")
+            print(f"Could not segment foreground from background in {filename}")
         else:
             bg_mask = utils.canny_central_ob(rgb_im, bg_mask, sigma)
             bg_mask = morphology.opening(bg_mask,
@@ -70,16 +69,25 @@ def segment_file(arg_tup):
                 arr=bg_mask,
                 cmap="binary_r"
             )
-            if diagnostic:
-                if not os.path.isdir(outfile + "/diagnostic"):
-                    os.mkdir(outfile + "/diagnostic")
-                out_fn = outfile + "/diagnostic/" + filename.split("/")[-1]
-                plt.imsave(
-                    fname=out_fn.replace(".png", "_bg.png"),
-                    arr=segmentation.mark_boundaries(
+            try:
+                comp_mask = segment.barb_hue(rgb_im, bg_mask)
+            except:
+                print(f"Could not segment healthy from brown in {filename}")
+            else:
+                if diagnostic:
+                    if not os.path.isdir(outfile + "/diagnostic"):
+                        os.mkdir(outfile + "/diagnostic")
+                    diag_im = segmentation.mark_boundaries(
                         rgb_im, bg_mask,
-                        color=(7/255, 234/255, 250/255))
-                )
+                        color=(7 / 255, 234 / 255, 250 / 255))
+                    diag_im = segmentation.mark_boundaries(
+                        diag_im, comp_mask == 2,
+                        color=(1, 1, 1))
+                    out_fn = outfile + "/diagnostic/" + filename.split("/")[-1]
+                    plt.imsave(
+                        fname=out_fn.replace(".png", "_bg.png"),
+                        arr=diag_im
+                    )
 
 
 def pool_handler(cores, fun, params):

@@ -8,6 +8,7 @@ Contains functions for segmenting RGB images
 from skimage import io, color, filters, segmentation, util, morphology
 import numpy as np
 from scipy import signal
+import utils
 
 
 def elevation_map(rgb_im):
@@ -154,6 +155,58 @@ def merge_masks(bg_mask, pheno_mask):
     comb_mask[substep == 2] = 1
     comb_mask[bg_mask == 0] = 0
     return comb_mask
+
+
+def barb_thresh(im_channel):
+    """ Defines the threshold of an image channel based on its histogram
+
+      :param im_channel: np.ndarray, 2d array, meant to be hue channel of hsv or
+          a channel of lab
+      :return float, the threshold of the image channel that separates it into
+          healthy and unhealthy tissue
+    """
+    values, bins = np.histogram(im_channel, bins=100)
+    peak_i = np.argmax(values)
+    val_max = values[peak_i]
+    bin_max = bins[peak_i]
+    if bin_max <= 0.4:
+        bound = 0.2 * val_max
+    else:
+        bound = 0.5 * val_max
+    ref_val = values[values > bound][-1]
+    ref_i = np.where(values == ref_val)[0][0]
+    ref_bin = bins[ref_i]
+    thresh = 2 * ref_bin / 3.5
+    return thresh
+
+
+def barb_hue(image, bg_mask=None):
+    """ Takes an image of plant tissue and segments into healthy and brown
+
+      :param image: np.ndarray, 3d array representing an rgb image
+      :param bg_mask: np.ndarray, 2d array to mask the background
+      :return np.ndarray, mask with background as 0, healthy tissue as 1 and
+          brown tissue as 2
+    """
+    if bg_mask is not None:
+        # Apply mask to rgb_im
+        rgb_im = utils.multichannel_mask(image, bg_mask)
+    # Get hue channel and scale from 0 to 1
+    hue = color.rgb2hsv(image)[:, :, 0]
+    hue_con = utils.increase_contrast(hue)
+    hue_fg = hue_con[bg_mask == 1]
+    # Healthy tissue masking
+    thresh = barb_thresh(hue_fg)
+    healthy_mask = (hue_con > thresh).astype(int)
+    # Remove noise
+    healthy_mask = morphology.remove_small_holes(
+        healthy_mask,
+        area_threshold=(image.shape[0] + image.shape[1]) // 2000
+    )
+    # Combine healthy and bg mask to get compound image
+    bg_mask = bg_mask.astype(int)
+    comp_mask = merge_masks(bg_mask, healthy_mask)
+    return comp_mask
 
 
 def main():
