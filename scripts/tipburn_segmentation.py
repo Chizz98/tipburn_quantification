@@ -120,6 +120,7 @@ def main():
         files, [args.out] * len(files),
         [args.s] * len(files),
         [args.d] * len(files))
+    # Pooled segmentation
     pool_handler(args.c, segment_file, param_list)
 
 
