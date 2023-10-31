@@ -91,7 +91,7 @@ def segment_file(arg_tup):
                         color=(7 / 255, 234 / 255, 250 / 255))
                     plt.imsave(
                         fname=out_fn.replace(".png", "_fg.png"),
-                        arr=bg_diag
+                        arr=fg_diag
                     )
 
 
