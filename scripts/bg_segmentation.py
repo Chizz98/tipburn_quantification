@@ -70,11 +70,19 @@ def segment_file(arg_tup):
                 cmap="binary_r"
             )
             try:
-                comp_mask = segment.barb_hue(rgb_im, bg_mask)
+                comp_mask = segment.barb_hue(
+                    rgb_im,
+                    morphology.erosion(bg_mask.copy(),
+                                       footprint=morphology.disk(2)))
             except:
                 print(f"Could not segment healthy from brown in {filename}")
             else:
                 if diagnostic:
+                    plt.imsave(
+                        fname=out_fn.replace(".png", "_comp.png"),
+                        arr=comp_mask,
+                        cmap="binary_r"
+                    )
                     if not os.path.isdir(outfile + "/diagnostic"):
                         os.mkdir(outfile + "/diagnostic")
                     bg_diag = segmentation.mark_boundaries(

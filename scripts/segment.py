@@ -201,7 +201,7 @@ def barb_hue(image, bg_mask=None):
     # Remove noise
     healthy_mask = morphology.remove_small_holes(
         healthy_mask,
-        area_threshold=(image.shape[0] + image.shape[1]) // 2000
+        area_threshold=(image.shape[0] + image.shape[1]) // 200
     )
     # Combine healthy and bg mask to get compound image
     bg_mask = bg_mask.astype(int)
