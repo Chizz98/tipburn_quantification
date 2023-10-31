@@ -105,13 +105,14 @@ def segment_file(arg_tup):
 
 
 def parse_segmentations(image_files, out_dir):
-    filename_pattern = re.compile(r"(?:\/|\\)([0-9]+)-([0-9]+).+Tray_0([0-9]*)."
+    filename_pattern = re.compile(r".*([0-9]+)-([0-9]+).+Tray_0([0-9]*)."
                                   r"+pos([0-9*])_(.*).png")
     outfile = open(out_dir + "/pixel_table.txt", "w")
     outfile.write("\t".join(
         ["experiment", "round", "tray", "position", "accession", "full_healthy",
          "full_brown", "hearth_healthy", "hearth_brown"]) + "\n"
     )
+    count = 0
     for file in image_files:
         match = filename_pattern.search(file)
         if match:
@@ -140,6 +141,8 @@ def parse_segmentations(image_files, out_dir):
             exp_dat += [healthy_full, brown_full, healthy_hearth, brown_hearth]
         exp_dat = [str(dat) for dat in exp_dat]
         outfile.write("\t".join(exp_dat) + "\n")
+        count += 1
+        print(f"File {count} of {len(image_files)} parsed")
     outfile.close()
 
 
