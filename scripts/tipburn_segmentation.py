@@ -82,7 +82,9 @@ def segment_file(arg_tup):
                     plt.imsave(
                         fname=out_fn.replace(".png", "_comp.png"),
                         arr=comp_mask,
-                        cmap="binary_r"
+                        cmap="binary_r",
+                        vmin=0,
+                        vmax=2
                     )
                     if not os.path.isdir(outfile + "/diagnostic"):
                         os.mkdir(outfile + "/diagnostic")
