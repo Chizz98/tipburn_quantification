@@ -77,16 +77,21 @@ def segment_file(arg_tup):
                 if diagnostic:
                     if not os.path.isdir(outfile + "/diagnostic"):
                         os.mkdir(outfile + "/diagnostic")
-                    diag_im = segmentation.mark_boundaries(
+                    bg_diag = segmentation.mark_boundaries(
                         rgb_im, bg_mask,
                         color=(7 / 255, 234 / 255, 250 / 255))
-                    diag_im = segmentation.mark_boundaries(
-                        diag_im, comp_mask == 2,
-                        color=(1, 1, 1))
                     out_fn = outfile + "/diagnostic/" + filename.split("/")[-1]
                     plt.imsave(
                         fname=out_fn.replace(".png", "_bg.png"),
-                        arr=diag_im
+                        arr=bg_diag
+                    )
+                    fg_diag = utils.multichannel_mask(rgb_im, comp_mask == 2)
+                    fg_diag = segmentation.mark_boundaries(
+                        fg_diag, bg_mask,
+                        color=(7 / 255, 234 / 255, 250 / 255))
+                    plt.imsave(
+                        fname=out_fn.replace(".png", "_fg.png"),
+                        arr=bg_diag
                     )
 
 
