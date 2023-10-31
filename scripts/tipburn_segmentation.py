@@ -2,11 +2,12 @@
 import os
 import segment
 import utils
-from skimage import io, util, color, morphology, segmentation
+from skimage import io, util, color, morphology, segmentation, measure
 from multiprocessing import Pool
 import numpy as np
 import argparse as arg
 import matplotlib.pyplot as plt
+import re
 
 
 def arg_reader():
@@ -103,6 +104,45 @@ def segment_file(arg_tup):
                     )
 
 
+def parse_segmentations(image_files, out_dir):
+    filename_pattern = re.compile(r"(?:\/|\\)([0-9]+)-([0-9]+).+Tray_0([0-9]*)."
+                                  r"+pos([0-9*])_(.*).png")
+    outfile = open(out_dir + "/pixel_table.txt", "w")
+    outfile.write("\t".join(
+        ["experiment", "round", "tray", "position", "accession", "full_healthy",
+         "full_brown", "hearth_healthy", "hearth_brown"]) + "\n"
+    )
+    for file in image_files:
+        match = filename_pattern.search(file)
+        if match:
+            exp_dat = list(match.groups())
+        else:
+            exp_dat = ["NA"] * 5
+        mask_fn = out_dir + "/" + file.split("/")[-1]
+        mask_fn = mask_fn.replace(".png", "_comp.png")
+        try:
+            mask = io.imread(mask_fn, as_gray=True) // 0.5
+        except:
+            exp_dat += ["NA", "NA", "NA", "NA"]
+        else:
+            full_mask = morphology.disk((min(mask.shape[:2]) - 1)/2) * mask
+            healthy_full = (full_mask == 1).sum()
+            brown_full = (full_mask == 2).sum()
+            hearth_disk = morphology.disk((min(mask.shape[:2]) - 2)/4)
+            hearth = utils.crop_region(
+                mask,
+                (mask.shape[0] // 2, mask.shape[1] // 2),
+                (hearth_disk.shape[0], hearth_disk.shape[1])
+            )
+            hearth_mask = hearth * hearth_disk
+            healthy_hearth = (hearth_mask == 1).sum()
+            brown_hearth = (hearth_mask == 2).sum()
+            exp_dat += [healthy_full, brown_full, healthy_hearth, brown_hearth]
+        exp_dat = [str(dat) for dat in exp_dat]
+        outfile.write("\t".join(exp_dat) + "\n")
+    outfile.close()
+
+
 def pool_handler(cores, fun, params):
     pools = Pool(cores)
     pools.map(fun, params)
@@ -122,6 +162,8 @@ def main():
         [args.d] * len(files))
     # Pooled segmentation
     pool_handler(args.c, segment_file, param_list)
+    # Parse segmentations into file
+    parse_segmentations(files, args.out)
 
 
 if __name__ == "__main__":
