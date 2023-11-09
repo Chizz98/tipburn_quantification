@@ -19,17 +19,15 @@ def crop_region(image, centre, shape):
         pixels as integers
     :return: The cropped region of the original image
     """
-    shape_r = np.array(shape)
-    shape_r[shape_r % 2 == 1] += 1
     if image.ndim == 2:
         crop = image[
-               centre[1] - shape_r[1] // 2: centre[1] + shape[1] // 2,
-               centre[0] - shape_r[0] // 2: centre[0] + shape[0] // 2
+               centre[1] - shape[0] // 2: centre[1] + shape[0] // 2,
+               centre[0] - shape[1] // 2: centre[0] + shape[1] // 2
                ]
     else:
         crop = image[
-               centre[1] - shape_r[1] // 2: centre[1] + shape[1] // 2,
-               centre[0] - shape_r[0] // 2: centre[0] + shape[0] // 2,
+               centre[1] - shape[0] // 2: centre[1] + shape[0] // 2,
+               centre[0] - shape[1] // 2: centre[0] + shape[1] // 2
                :
                ]
     return crop
