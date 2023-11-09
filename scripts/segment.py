@@ -122,6 +122,8 @@ def shw_segmentation(image):
     :param image: np.ndarray representing a 3d image
     :return np.ndarray, 2D mask for the image
     """
+    if image.shape[2] == 4:
+        image = util.img_as_ubyte(color.rgba2rgb(image))
     comp_sob = filters.sobel(image)
     comp_sob = comp_sob[:, :, 0] + comp_sob[:, :, 1] + comp_sob[:, :, 2]
     elevation = filters.sobel(comp_sob)
