@@ -70,7 +70,7 @@ def main():
         os.mkdir(args.out)
     if os.path.isdir(args.filename):
         files = [file for file in os.listdir(args.filename) if
-                 file.find("Original") != -1 and file.startswith("51-40")]
+                 file.find("Original") != -1 and file.startswith("51-78")]
         tot_files = len(files)
         for file in files:
             try:

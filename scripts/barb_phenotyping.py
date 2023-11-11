@@ -60,7 +60,7 @@ def barb_hue(image, bg_mask=None):
     """
     if bg_mask is not None:
         # Apply mask to rgb_im
-        rgb_im = utils.multichannel_mask(image, bg_mask)
+        image = utils.multichannel_mask(image, bg_mask)
     # Get hue channel and scale from 0 to 1
     hue = color.rgb2hsv(image)[:, :, 0]
     hue_con = utils.increase_contrast(hue)
