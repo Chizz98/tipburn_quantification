@@ -107,7 +107,7 @@ def segment_file(arg_tup):
 
 
 def parse_segmentations(image_files, out_dir):
-    filename_pattern = re.compile(r".*[\/,\\]([0-9]+)-([0-9]+).+Tray_0([0-9]*)"
+    filename_pattern = re.compile(r".*[\/\\]([0-9]+)-([0-9]+).+Tray_0([0-9]*)"
                                   r".+pos([0-9*])_(.*).png")
     outfile = open(out_dir + "/pixel_table.txt", "w")
     outfile.write("\t".join(
