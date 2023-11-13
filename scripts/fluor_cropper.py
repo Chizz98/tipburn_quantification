@@ -1,4 +1,4 @@
-from skimage import io, measure, registration, transform
+from skimage import io, measure, registration, transform, filters
 import utils
 import argparse as arg
 import os
@@ -56,7 +56,7 @@ def rough_crop(mask_a, mask_b, step):
 def overlap_crop(mask_a, mask_b, full_image):
     rough_cen = rough_crop(mask_a, mask_b, 100)
     crop = utils.crop_region(full_image, rough_cen, (1500, 1500))
-    crop_mask = crop > 3 * 10 ** 3
+    crop_mask = crop > filters.threshold_otsu(crop)
     rgb_labs = measure.label(mask_a)
     crop_labs = measure.label(crop_mask)
     rgb_mask = rgb_labs == utils.centre_primary_label(rgb_labs)
@@ -89,7 +89,7 @@ def worker(arg_tup):
     fm_im = utils.read_fimg(fluor_dir + "/" + fluor_match)
     fm_im = transform.resize(fm_im, (2823, 3750))
     rgb_mask = segment.shw_segmentation(rgb_im)
-    fm_mask = fm_im > 3 * 10**3
+    fm_mask = fm_im > filters.threshold_otsu(fm_im)
     fm_crop = overlap_crop(rgb_mask, fm_mask, fm_im)
     np.save(outdir + "/" + rgb_fn.replace(".png", "_Fm"), fm_crop)
     if diag:
