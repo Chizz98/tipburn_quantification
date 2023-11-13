@@ -1,10 +1,39 @@
-from skimage import io, measure, transform, segmentation, color, \
-    util, registration
+from skimage import io, measure, registration, transform
 import utils
+import argparse as arg
+import os
+from multiprocessing import Pool
 import segment
-import barb_phenotyping
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+def arg_reader():
+    """ Reads arguments from command line
+
+    :return ..., class containing the arguments
+    """
+    arg_parser = arg.ArgumentParser(
+        description="Segments rgb images based on predetermined thresholds"
+    )
+    arg_parser.add_argument("rgb_path", help="The path to the directory holding"
+                                             " the rgb images")
+    arg_parser.add_argument("fluor_path", help="The path to the directory "
+                                               "holding the fluorescence "
+                                               "images")
+    arg_parser.add_argument("out", help="The directory to write the files "
+                                        "to. Does not need to be "
+                                        "pre_existing.")
+    arg_parser.add_argument("-c", help="Cores used for multiprocessing, 1 by "
+                                       "default",
+                            type=int, default=1)
+    arg_parser.add_argument("-d", help="If this flag is set, a subdirectory "
+                                       "will be made in out directory that "
+                                       "contains false color images of the "
+                                       "fluorescence crops of the mask "
+                                       "overlayed.",
+                            action="store_true")
+    return arg_parser.parse_args()
 
 
 def rough_crop(mask_a, mask_b, step):
@@ -44,17 +73,46 @@ def overlap_crop(mask_a, mask_b, full_image):
     return final_crop
 
 
-def main():
-    fm_im = utils.read_fimg("../test_images/51-78-Lettuce_Correct_Tray_054-"
-                            "FC1-FcParamImage-Fm.fimg")
-    fm_resized = transform.resize(fm_im, (2823, 3750))
-    fm_mask = fm_resized > 3 * 10 ** 3
+def pool_handler(cores, fun, params):
+    pools = Pool(cores)
+    pools.map(fun, params)
 
-    rgb_im = io.imread("../test_images/51-78-Lettuce_Correct_Tray_054"
-                       "-RGB-Original_pos5_LK190.png")
+
+def worker(arg_tup):
+    rgb_crop, fluor_dir, outdir, diag = arg_tup
+    rgb_fn = rgb_crop.split("/")[-1]
+    ident = "-".join(rgb_fn.split("-")[:3])
+    fluor_files = os.listdir(fluor_dir)
+    fluor_match = [file for file in fluor_files if
+                   file.startswith(ident) and file.endswith("-Fm.fimg")][0]
+    rgb_im = io.imread(rgb_crop)
+    fm_im = utils.read_fimg(fluor_dir + "/" + fluor_match)
+    fm_im = transform.resize(fm_im, (2823, 3750))
     rgb_mask = segment.shw_segmentation(rgb_im)
+    fm_mask = fm_im > 3 * 10**3
+    fm_crop = overlap_crop(rgb_mask, fm_mask, fm_im)
+    np.save(outdir + "/" + rgb_fn.replace(".png", "_Fm"), fm_crop)
+    if diag:
+        if not os.path.isdir(outdir + "/diagnostic"):
+            os.mkdir(outdir + "/diagnostic")
+        plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(".png", "_Fm.png"),
+                   fm_crop)
 
-    fm_crop = overlap_crop(rgb_mask, fm_mask, fm_resized)
+
+def main():
+    # Read arguments
+    args = arg_reader()
+    # Create out_dir if not existing
+    if not os.path.isdir(args.out):
+        os.mkdir(args.out)
+    # Create list of files
+    files = [args.rgb_path + "/" + file for file in os.listdir(args.rgb_path)]
+    # Create list of parameters
+    params = zip(files, [args.fluor_path] * len(files), [args.out] * len(files),
+                 [args.d] * len(files))
+    # Send to pool handler
+    pool_handler(args.c, worker, params)
+
 
 
 if __name__ == "__main__":
