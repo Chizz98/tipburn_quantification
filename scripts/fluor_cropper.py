@@ -65,9 +65,11 @@ def overlap_crop(mask_a, mask_b, full_image):
         reference_image=rgb_mask,
         moving_image=crop_mask
     )
+    full_image = np.pad(full_image, 500)
     final_crop = utils.crop_region(
         full_image,
-        (int(rough_cen[0] - shift[1]), int(rough_cen[1] - shift[0])),
+        (int(rough_cen[0] - shift[1] + 500),
+         int(rough_cen[1] - shift[0] + 500)),
         (1500, 1500)
     )
     return final_crop
