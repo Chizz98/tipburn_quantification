@@ -14,7 +14,7 @@ def arg_reader():
     :return ..., class containing the arguments
     """
     arg_parser = arg.ArgumentParser(
-        description="Segments rgb images based on predetermined thresholds"
+        description="Creates crops of fluorescence images that match RGB crops."
     )
     arg_parser.add_argument("rgb_path", help="The path to the directory holding"
                                              " the rgb images")
