@@ -113,10 +113,10 @@ def worker(arg_tup):
         if not os.path.isdir(outdir + "/diagnostic"):
             os.mkdir(outdir + "/diagnostic")
         plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(
-            ".png", "-" + pos + "_Fm.png"),
+            ".png", "_Fm.png"),
                    fm_crop)
         plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(
-            ".png", "-" + pos + "_FvFm.png"),
+            ".png", "_FvFm.png"),
                    fvfm_crop)
 
 
