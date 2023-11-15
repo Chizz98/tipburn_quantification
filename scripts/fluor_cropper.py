@@ -107,8 +107,8 @@ def worker(arg_tup):
         (centre[0] + 500, centre[1] + 500),
         shape=(1500, 1500)
     )
-    np.save(outdir + "/" + rgb_fn.replace(".png", "-" + pos + "_Fm"), fm_crop)
-    np.save(outdir + "/" + rgb_fn.replace(".png", "-" + pos + "_FvFm"), fvfm_crop)
+    np.save(outdir + "/" + rgb_fn.replace(".png", "_Fm"), fm_crop)
+    np.save(outdir + "/" + rgb_fn.replace(".png", "_FvFm"), fvfm_crop)
     if diag:
         if not os.path.isdir(outdir + "/diagnostic"):
             os.mkdir(outdir + "/diagnostic")
