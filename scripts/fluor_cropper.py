@@ -86,6 +86,7 @@ def pool_handler(cores, fun, params):
 def worker(arg_tup):
     rgb_crop, fluor_dir, outdir, diag = arg_tup
     rgb_fn = rgb_crop.split("/")[-1]
+    pos = rgb_fn.split("_")[-2]
     ident = "-".join(rgb_fn.split("-")[:3])
     fluor_files = os.listdir(fluor_dir)
     fm_match = [file for file in fluor_files if
@@ -106,15 +107,16 @@ def worker(arg_tup):
         (centre[0] + 500, centre[1] + 500),
         shape=(1500, 1500)
     )
-    np.save(outdir + "/" + rgb_fn.replace(".png", "_Fm"), fm_crop)
-    np.save(outdir + "/" + rgb_fn.replace(".png", "_FvFm"), fvfm_crop)
+    np.save(outdir + "/" + rgb_fn.replace(".png", "-" + pos + "_Fm"), fm_crop)
+    np.save(outdir + "/" + rgb_fn.replace(".png", "-" + pos + "_FvFm"), fvfm_crop)
     if diag:
         if not os.path.isdir(outdir + "/diagnostic"):
             os.mkdir(outdir + "/diagnostic")
-        plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(".png", "_Fm.png"),
+        plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(
+            ".png", "-" + pos + "_Fm.png"),
                    fm_crop)
-        plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(".png",
-                                                            "_FvFm.png"),
+        plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(
+            ".png", "-" + pos + "_FvFm.png"),
                    fvfm_crop)
 
 
