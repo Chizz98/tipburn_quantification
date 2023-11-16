@@ -94,30 +94,35 @@ def worker(arg_tup):
     fvfm_match = [file for file in fluor_files if
                   file.startswith(ident) and file.endswith("-Fv_Fm.fimg")][0]
     rgb_im = io.imread(rgb_crop)
-    fm_im = utils.read_fimg(fluor_dir + "/" + fm_match)
-    fvfm_im = utils.read_fimg(fluor_dir + "/" + fvfm_match)
-    fm_im = transform.resize(fm_im, (2823, 3750))
-    fvfm_im = transform.resize(fvfm_im, (2823, 3750))
-    rgb_mask = segment.shw_segmentation(rgb_im)
-    fm_mask = fm_im > filters.threshold_otsu(fm_im)
-    fm_crop, centre = overlap_crop(rgb_mask, fm_mask, fm_im, True)
-    fvfm_im = np.pad(fvfm_im, 500)
-    fvfm_crop = utils.crop_region(
-        fvfm_im,
-        (centre[0] + 500, centre[1] + 500),
-        shape=(1500, 1500)
-    )
-    np.save(outdir + "/" + rgb_fn.replace(".png", "_Fm"), fm_crop)
-    np.save(outdir + "/" + rgb_fn.replace(".png", "_FvFm"), fvfm_crop)
-    if diag:
-        if not os.path.isdir(outdir + "/diagnostic"):
-            os.mkdir(outdir + "/diagnostic")
-        plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(
-            ".png", "_Fm.png"),
-                   fm_crop)
-        plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(
-            ".png", "_FvFm.png"),
-                   fvfm_crop)
+    try:
+        fm_im = utils.read_fimg(fluor_dir + "/" + fm_match)
+        fvfm_im = utils.read_fimg(fluor_dir + "/" + fvfm_match)
+    except:
+        print(f"Fluorescence files {fluor_dir + '/' + fm_match}"
+              f"{fluor_dir + '/' + fvfm_match}) could not be read")
+    else:
+        fm_im = transform.resize(fm_im, (2823, 3750))
+        fvfm_im = transform.resize(fvfm_im, (2823, 3750))
+        rgb_mask = segment.shw_segmentation(rgb_im)
+        fm_mask = fm_im > filters.threshold_otsu(fm_im)
+        fm_crop, centre = overlap_crop(rgb_mask, fm_mask, fm_im, True)
+        fvfm_im = np.pad(fvfm_im, 500)
+        fvfm_crop = utils.crop_region(
+            fvfm_im,
+            (centre[0] + 500, centre[1] + 500),
+            shape=(1500, 1500)
+        )
+        np.save(outdir + "/" + rgb_fn.replace(".png", "_Fm"), fm_crop)
+        np.save(outdir + "/" + rgb_fn.replace(".png", "_FvFm"), fvfm_crop)
+        if diag:
+            if not os.path.isdir(outdir + "/diagnostic"):
+                os.mkdir(outdir + "/diagnostic")
+            plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(
+                ".png", "_Fm.png"),
+                       fm_crop)
+            plt.imsave(outdir + "/diagnostic/" + rgb_fn.replace(
+                ".png", "_FvFm.png"),
+                       fvfm_crop)
 
 
 def main():
