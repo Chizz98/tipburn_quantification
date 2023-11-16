@@ -55,7 +55,7 @@ def rough_crop(mask_a, mask_b, step):
 
 
 def overlap_crop(mask_a, mask_b, full_image, return_coords=False):
-    rough_cen = rough_crop(mask_a, mask_b, 100)
+    rough_cen = rough_crop(mask_a, mask_b, 50)
     crop = utils.crop_region(full_image, rough_cen, (1500, 1500))
     crop_mask = crop > filters.threshold_otsu(crop)
     rgb_labs = measure.label(mask_a)
