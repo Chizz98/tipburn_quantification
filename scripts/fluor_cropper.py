@@ -85,6 +85,7 @@ def pool_handler(cores, fun, params):
 
 
 def worker(arg_tup):
+    print(f"Starting work on {arg_tup}")
     rgb_crop, fluor_dir, outdir, diag = arg_tup
     rgb_fn = rgb_crop.split("/")[-1]
     pos = rgb_fn.split("_")[-2]
