@@ -88,14 +88,23 @@ def worker(arg_tup):
     print(f"Starting work on {arg_tup}")
     rgb_crop, fluor_dir, outdir, diag = arg_tup
     rgb_fn = rgb_crop.split("/")[-1]
-    pos = rgb_fn.split("_")[-2]
     ident = "-".join(rgb_fn.split("-")[:3])
     fluor_files = os.listdir(fluor_dir)
-    fm_match = [file for file in fluor_files if
-                file.startswith(ident) and file.endswith("-Fm.fimg")][0]
-    fvfm_match = [file for file in fluor_files if
-                  file.startswith(ident) and file.endswith("-Fv_Fm.fimg")][0]
-    rgb_im = io.imread(rgb_crop)
+    try:
+        fm_match = [file for file in fluor_files if
+                    file.startswith(ident) and file.endswith("-Fm.fimg")][0]
+        fvfm_match = [file for file in fluor_files if
+                      file.startswith(ident) and file.endswith("-Fv_Fm.fimg")][0]
+    except Exception as e:
+        print(f"No matching fluor files found for {rgb_crop}."
+              f"Exception: {e}")
+        return
+    try:
+        rgb_im = io.imread(rgb_crop)
+    except Exception as e:
+        print(f"Rgb file {rgb_crop} could not be read."
+              f"Exception: {e}")
+        return
     try:
         fm_im = utils.read_fimg(fluor_dir + "/" + fm_match)
         fvfm_im = utils.read_fimg(fluor_dir + "/" + fvfm_match)
@@ -103,6 +112,7 @@ def worker(arg_tup):
         print(f"Fluorescence files {fluor_dir + '/' + fm_match}"
               f"{fluor_dir + '/' + fvfm_match}) could not be read."
               f"Exception: {e}")
+        return
     fm_im = transform.resize(fm_im, (2823, 3750))
     fvfm_im = transform.resize(fvfm_im, (2823, 3750))
     rgb_mask = segment.shw_segmentation(rgb_im)
