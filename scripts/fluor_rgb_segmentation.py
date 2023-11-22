@@ -96,9 +96,7 @@ def worker(arg_tup):
     fvfm_im = np.load(fluor_dir + "/" + fluor_match)
     fvfm_im = utils.increase_contrast(fvfm_im)
     fm_mask = fvfm_im > fluor_thresh(fvfm_im[bg_mask == 1])
-    fm_comp = np.zeros_like(fm_mask)
-    fm_comp[bg_mask == 1] = 1
-    fm_comp[(bg_mask == 1) & (fm_mask == 0)] = 2
+    fm_comp = fm_mask + bg_mask
     # Combined mask
     final_mask = np.zeros_like(comp_mask)
     final_mask[comp_mask > 0] = 1
@@ -106,7 +104,7 @@ def worker(arg_tup):
 
     plot, axes = plt.subplots(2, 2, sharex=True, sharey=True)
     axes[0, 0].imshow(rgb_im)
-    axes[0, 1].imshow(fm_comp)
+    axes[0, 1].imshow(fm_comp, cmap="viridis_r")
     axes[1, 0].imshow(comp_mask)
     axes[1, 1].imshow(final_mask)
     plot.set_size_inches(20, 20)
