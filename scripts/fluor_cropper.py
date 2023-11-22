@@ -125,10 +125,8 @@ def main():
     match_dict = {}
     for file in fluor_files:
         ident = "-".join(file.split("/")[-1].split("-")[0:3]) + "-"
-        print(ident)
         match_dict[file] = [file for file in rgb_files if
                             file.split("/")[-1].startswith(ident)]
-    [print(match) for match in match_dict.items()]
     params = [tuple(list(tup) +
                     [tup[0].replace("-Fm.fimg", "-Fv_Fm.fimg"),
                      args]) for tup in match_dict.items()]
