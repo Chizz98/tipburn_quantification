@@ -2,7 +2,7 @@
 import os
 import segment
 import utils
-from skimage import io, util, color, morphology
+from skimage import io, util, color, morphology, filters
 from multiprocessing import Pool
 import numpy as np
 import argparse as arg
@@ -94,6 +94,7 @@ def worker(arg_tup):
     )
     # Handle fluor
     fvfm_im = np.load(fluor_dir + "/" + fluor_match)
+    fvfm_im = filters.median(fvfm_im, footprint=morphology.disk(2.5))
     fvfm_im = utils.increase_contrast(fvfm_im)
     fm_mask = fvfm_im > fluor_thresh(fvfm_im[bg_mask == 1])
     fm_comp = fm_mask.astype(int) + bg_mask.astype(int)
