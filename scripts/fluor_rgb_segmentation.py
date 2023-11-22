@@ -59,7 +59,7 @@ def fluor_thresh(im_channel):
     ref_i = np.where(values == ref_val)[0][0]
     ref_bin = bins[ref_i]
     thresh = 2 * ref_bin / 4.5
-    return thresh, ref_bin
+    return thresh
 
 
 def pool_handler(cores, fun, params):
@@ -94,7 +94,7 @@ def worker(arg_tup):
     )
     # Handle fluor
     fm_im = np.load(fluor_dir + "/" + fluor_match)
-    fm_im = util.img_as_ubyte(utils.increase_contrast(fm_im))
+    fm_im = utils.increase_contrast(fm_im)
     fm_mask = fm_im > fluor_thresh(fm_im)
     # Combined mask
     final_mask = np.zeros_like(comp_mask)
