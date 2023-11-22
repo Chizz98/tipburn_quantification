@@ -74,7 +74,7 @@ def worker(arg_tup):
     pos = rgb_fn.split("_")[-2]
     fluor_files = os.listdir(fluor_dir)
     fluor_match = [file for file in fluor_files if
-                   file.startswith(ident) and file.find(pos) != -1
+                   file.startswith(ident + "-") and file.find(pos) != -1
                    and file.endswith("_Fm.npy")][0]
     # Handle RGB
     rgb_im = io.imread(rgb_crop)
