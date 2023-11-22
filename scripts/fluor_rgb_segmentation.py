@@ -96,7 +96,7 @@ def worker(arg_tup):
     fvfm_im = np.load(fluor_dir + "/" + fluor_match)
     fvfm_im = utils.increase_contrast(fvfm_im)
     fm_mask = fvfm_im > fluor_thresh(fvfm_im[bg_mask == 1])
-    fm_comp = fm_mask + bg_mask
+    fm_comp = fm_mask.astype(int) + bg_mask.astype(int)
     # Combined mask
     final_mask = np.zeros_like(comp_mask)
     final_mask[comp_mask > 0] = 1
