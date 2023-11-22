@@ -75,7 +75,7 @@ def worker(arg_tup):
     fluor_files = os.listdir(fluor_dir)
     fluor_match = [file for file in fluor_files if
                    file.startswith(ident) and file.find(pos) != -1
-                   and file.endswith("Fm.npy")][0]
+                   and file.endswith("FvFm.npy")][0]
     # Handle RGB
     rgb_im = io.imread(rgb_crop)
     if rgb_im.shape[2] == 4:
@@ -93,9 +93,9 @@ def worker(arg_tup):
         morphology.erosion(bg_mask.copy(), footprint=morphology.disk(2))
     )
     # Handle fluor
-    fm_im = np.load(fluor_dir + "/" + fluor_match)
-    fm_im = utils.increase_contrast(fm_im)
-    fm_mask = fm_im > fluor_thresh(fm_im)
+    fvfm_im = np.load(fluor_dir + "/" + fluor_match)
+    fvfm_im = utils.increase_contrast(fvfm_im)
+    fm_mask = fvfm_im > fluor_thresh(fvfm_im)
     # Combined mask
     final_mask = np.zeros_like(comp_mask)
     final_mask[comp_mask > 0] = 1
