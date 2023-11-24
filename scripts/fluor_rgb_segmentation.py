@@ -106,7 +106,9 @@ def worker(arg_tup):
     plt.imsave(
         fname=outdir + "/" + rgb_fn.replace(".png", "_comp.png"),
         arr=final_mask,
-        cmap="binary_r"
+        cmap="binary_r",
+        vmin=0,
+        vmax=2
     )
     if diag:
         if not os.path.isdir(outdir + "/diagnostic"):
