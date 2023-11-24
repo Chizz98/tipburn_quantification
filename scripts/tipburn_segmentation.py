@@ -2,7 +2,7 @@
 import os
 import segment
 import utils
-from skimage import io, util, color, morphology, segmentation, measure
+from skimage import io, util, color, morphology, segmentation
 from multiprocessing import Pool
 import numpy as np
 import argparse as arg
