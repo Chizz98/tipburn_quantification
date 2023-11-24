@@ -58,7 +58,7 @@ def fluor_thresh(im_channel):
     ref_val = values[values > bound][-1]
     ref_i = np.where(values == ref_val)[0][0]
     ref_bin = bins[ref_i]
-    thresh = 2 * ref_bin / 4.4
+    thresh = 2 * ref_bin / 4.5
     return thresh
 
 
