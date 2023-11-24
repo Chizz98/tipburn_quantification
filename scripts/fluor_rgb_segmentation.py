@@ -104,7 +104,7 @@ def worker(arg_tup):
     final_mask[(comp_mask == 2) & (fm_mask == 0)] = 2
     # Save mask
     plt.imsave(
-        fname=outdir + "/" + rgb_fn.replace(".png", "_bg.png"),
+        fname=outdir + "/" + rgb_fn.replace(".png", "_comp.png"),
         arr=final_mask,
         cmap="binary_r"
     )
