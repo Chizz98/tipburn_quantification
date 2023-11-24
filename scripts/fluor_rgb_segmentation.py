@@ -102,15 +102,24 @@ def worker(arg_tup):
     final_mask = np.zeros_like(comp_mask)
     final_mask[comp_mask > 0] = 1
     final_mask[(comp_mask == 2) & (fm_mask == 0)] = 2
-
-    plot, axes = plt.subplots(2, 2, sharex=True, sharey=True)
-    axes[0, 0].imshow(rgb_im)
-    axes[0, 1].imshow(fm_comp, cmap="viridis_r")
-    axes[1, 0].imshow(comp_mask)
-    axes[1, 1].imshow(final_mask)
-    plot.set_size_inches(20, 20)
-    plt.tight_layout()
-    plot.savefig(outdir + "/" + rgb_fn.replace(".png", "_mask.png"))
+    # Save mask
+    plt.imsave(
+        fname=rgb_fn.replace(".png", "_bg.png"),
+        arr=bg_mask,
+        cmap="binary_r"
+    )
+    if diag:
+        if not os.path.isdir(outdir + "/diagnostic"):
+            os.mkdir(outdir + "/diagnostic")
+        plot, axes = plt.subplots(2, 2, sharex=True, sharey=True)
+        axes[0, 0].imshow(rgb_im)
+        axes[0, 1].imshow(fm_comp, cmap="viridis_r")
+        axes[1, 0].imshow(comp_mask)
+        axes[1, 1].imshow(final_mask)
+        plot.set_size_inches(20, 20)
+        plt.tight_layout()
+        plot.savefig(outdir + "/diagnostic/" +
+                     rgb_fn.replace(".png", "_mask.png"))
 
 
 def main():
