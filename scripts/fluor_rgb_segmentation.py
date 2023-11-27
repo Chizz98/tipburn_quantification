@@ -122,6 +122,7 @@ def worker(arg_tup):
         plt.tight_layout()
         plot.savefig(outdir + "/diagnostic/" +
                      rgb_fn.replace(".png", "_mask.png"))
+    plt.close("all")
 
 
 def main():
