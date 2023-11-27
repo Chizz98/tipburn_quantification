@@ -79,11 +79,17 @@ def worker(arg_tup):
             fvfm_im = transform.resize(utils.read_fimg(fvfm), (2823, 3750))
         except Exception as e:
             print(f"could not read fluorescence images, "
-                  f"Exception: {e}")
+                  f"Exception: {e}",
+                  flush=True)
         for rgb in rgbs:
             rgb_im = io.imread(rgb)
             rgb_fn = rgb.split("/")[-1]
-            new_centre = overlap_crop(rgb_im, fm_im)
+            try:
+                new_centre = overlap_crop(rgb_im, fm_im)
+            except Exception as e:
+                print(f"Could not overlap {rgb_im} with {fm_im}, "
+                      f"Exception : {e}",
+                      flush=True)
             fm_crop = utils.crop_region(np.pad(fm_im, 500),
                                         (new_centre[0] + 500,
                                          new_centre[1] + 500),
