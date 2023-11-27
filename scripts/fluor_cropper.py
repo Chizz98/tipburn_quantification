@@ -87,7 +87,7 @@ def worker(arg_tup):
             try:
                 new_centre = overlap_crop(rgb_im, fm_im)
             except Exception as e:
-                print(f"Could not overlap {rgb_im} with {fm_im}, "
+                print(f"Could not overlap {rgb_fn} with {fm}, "
                       f"Exception : {e}",
                       flush=True)
             fm_crop = utils.crop_region(np.pad(fm_im, 500),
