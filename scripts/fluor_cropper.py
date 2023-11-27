@@ -48,7 +48,11 @@ def rough_crop(mask_a, mask_b, step):
             crop = utils.crop_region(mask_b, (col, row), mask_a.shape)
             overlap = (crop == mask_a).sum()
             rough_overlap_dict[overlap] = (col, row)
-    optimum = rough_overlap_dict[max(rough_overlap_dict.keys())]
+    try:
+        optimum = rough_overlap_dict[max(rough_overlap_dict.keys())]
+    except Exception as e:
+        print(f"Could not determine maximum of {rough_overlap_dict}, "
+              f"Exception: {e}")
     return optimum
 
 
