@@ -48,11 +48,7 @@ def rough_crop(mask_a, mask_b, step):
             crop = utils.crop_region(mask_b, (col, row), mask_a.shape)
             overlap = (crop == mask_a).sum()
             rough_overlap_dict[overlap] = (col, row)
-    try:
-        optimum = rough_overlap_dict[max(rough_overlap_dict.keys())]
-    except Exception as e:
-        print(f"Could not determine maximum of {rough_overlap_dict}, "
-              f"Exception: {e}")
+    optimum = rough_overlap_dict[max(rough_overlap_dict.keys())]
     return optimum
 
 
@@ -100,8 +96,10 @@ def worker(arg_tup):
                                           (new_centre[0] + 500,
                                            new_centre[1] + 500),
                                           (1500, 1500))
-            np.save(cmd_args.out + "/" + rgb_fn.replace(".png", "_Fm"), fm_crop)
-            np.save(cmd_args.out + "/" + rgb_fn.replace(".png", "_FvFm"), fvfm_crop)
+            np.save(cmd_args.out + "/" + rgb_fn.replace(".png", "_Fm"),
+                    fm_crop)
+            np.save(cmd_args.out + "/" + rgb_fn.replace(".png", "_FvFm"),
+                    fvfm_crop)
             if cmd_args.d:
                 if not os.path.isdir(cmd_args.out + "/diagnostic"):
                     os.mkdir(cmd_args.out + "/diagnostic")
