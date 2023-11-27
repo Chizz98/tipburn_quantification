@@ -46,10 +46,9 @@ def rough_crop(mask_a, mask_b, step):
     for row in range(min_r, max_r + 1, step):
         for col in range(min_c, max_c + 1, step):
             crop = utils.crop_region(mask_b, (col, row), mask_a.shape)
-            if crop.shape == mask_a.shape:
-                overlap = (crop == mask_a).sum() / \
-                          (mask_a.shape[0] * mask_a.shape[1])
-                rough_overlap_dict[overlap] = (col, row)
+            overlap = (crop == mask_a).sum() / \
+                      (mask_a.shape[0] * mask_a.shape[1])
+            rough_overlap_dict[overlap] = (col, row)
     optimum = rough_overlap_dict[max(rough_overlap_dict.keys())]
     return optimum
 
