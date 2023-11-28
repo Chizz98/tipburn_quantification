@@ -70,11 +70,10 @@ def overlap_crop(rgb_im, full_image):
 
 
 def worker(arg_tup):
-    fm, rgbs, fvfm, cmd_args = arg_tup
+    fm, rgbs, cmd_args = arg_tup
     if rgbs:
         try:
             fm_im = transform.resize(utils.read_fimg(fm), (2823, 3750))
-            fvfm_im = transform.resize(utils.read_fimg(fvfm), (2823, 3750))
         except Exception as e:
             print(f"could not read fluorescence images, "
                   f"Exception: {e}",
@@ -92,23 +91,14 @@ def worker(arg_tup):
                                         (new_centre[0] + 500,
                                          new_centre[1] + 500),
                                         (1500, 1500))
-            fvfm_crop = utils.crop_region(np.pad(fvfm_im, 500),
-                                          (new_centre[0] + 500,
-                                           new_centre[1] + 500),
-                                          (1500, 1500))
             np.save(cmd_args.out + "/" + rgb_fn.replace(".png", "_Fm"),
                     fm_crop)
-            np.save(cmd_args.out + "/" + rgb_fn.replace(".png", "_FvFm"),
-                    fvfm_crop)
             if cmd_args.d:
                 if not os.path.isdir(cmd_args.out + "/diagnostic"):
                     os.mkdir(cmd_args.out + "/diagnostic")
                 plt.imsave(cmd_args.out + "/diagnostic/" + rgb_fn.replace(
                     ".png", "_Fm.png"),
                            fm_crop)
-                plt.imsave(cmd_args.out + "/diagnostic/" + rgb_fn.replace(
-                    ".png", "_FvFm.png"),
-                           fvfm_crop)
 
 
 def pool_handler(cores, fun, params):
@@ -133,9 +123,7 @@ def main():
         ident = "-".join(file.split("/")[-1].split("-")[0:3]) + "-"
         match_dict[file] = [file for file in rgb_files if
                             file.split("/")[-1].startswith(ident)]
-    params = [tuple(list(tup) +
-                    [tup[0].replace("-Fm.fimg", "-Fv_Fm.fimg"),
-                     args]) for tup in match_dict.items()]
+    params = [tuple(list(tup) + [args]) for tup in match_dict.items()]
     pool_handler(args.c,
                  worker,
                  params)
