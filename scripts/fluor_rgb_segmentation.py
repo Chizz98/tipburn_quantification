@@ -73,9 +73,14 @@ def worker(arg_tup):
     ident = "-".join(rgb_fn.split("-")[:3])
     pos = rgb_fn.split("_")[-2]
     fluor_files = os.listdir(fluor_dir)
-    fluor_match = [file for file in fluor_files if
-                   file.startswith(ident + "-") and file.find(pos) != -1
-                   and file.endswith("_Fm.npy")][0]
+    try:
+        fluor_match = [file for file in fluor_files if
+                       file.startswith(ident + "-") and file.find(pos) != -1
+                       and file.endswith("_Fm.npy")][0]
+    except Exception as e:
+        print(f"Could not find a fluor match for {rgb_fn}. Exception: {e}",
+              flush=True)
+        return
     # Handle RGB
     rgb_im = io.imread(rgb_crop)
     if rgb_im.shape[2] == 4:
