@@ -25,6 +25,7 @@ def arg_reader():
     arg_parser.add_argument("out", help="The directory to write the files "
                                         "to. Does not need to be "
                                         "pre_existing.")
+    arg_parser.add_argument("round", help="The round you want to crop.")
     arg_parser.add_argument("-c", help="Cores used for multiprocessing, 1 by "
                                        "default",
                             type=int, default=1)
@@ -114,7 +115,8 @@ def main():
         os.mkdir(args.out)
     # Create list of files
     fluor_files = [args.fluor_path + "/" + file for file in
-                   os.listdir(args.fluor_path) if file.endswith("-Fm.fimg")]
+                   os.listdir(args.fluor_path) if file.endswith("-Fm.fimg") and
+                   file.startswith(f"51_{args.round}-")]
     rgb_files = [args.rgb_path + "/" + file for file in
                  os.listdir(args.rgb_path)]
     # Match dict
