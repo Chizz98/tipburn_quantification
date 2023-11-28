@@ -85,7 +85,12 @@ def worker(arg_tup):
     rgb_im = io.imread(rgb_crop)
     if rgb_im.shape[2] == 4:
         rgb_im = util.img_as_ubyte(color.rgba2rgb(rgb_im))
-    bg_mask = segment.shw_segmentation(rgb_im)
+    try:
+        bg_mask = segment.shw_segmentation(rgb_im)
+    except Exception as e:
+        print(f"Could not find canny central lab for {rgb_fn}. Exception: {e}",
+              flush=True)
+        return
     bg_mask = utils.canny_central_ob(rgb_im, bg_mask, sigma)
     bg_mask = morphology.opening(bg_mask, footprint=np.ones((5, 10)))
     bg_mask = morphology.opening(bg_mask, footprint=np.ones((10, 5)))
