@@ -69,11 +69,23 @@ def fluor_thresh(im_channel):
 
 
 def pool_handler(cores, fun, params):
+    """ Multiprocessing pool handler
+
+    :param cores: int, amount of cores to be used
+    :param fun: function, the worker function
+    :param params: tuple, the parameter tuples
+    :return: None, maps arguments to function
+    """
     pools = Pool(cores)
     pools.map(fun, params)
 
 
 def worker(arg_tup):
+    """ Worker for multiprocessing
+
+    :param arg_tup: tuple, contains arguments
+    :return: None, writes outfiles
+    """
     rgb_crop, fluor_dir, outdir, diag, sigma = arg_tup
     rgb_fn = rgb_crop.split("/")[-1]
     ident = "-".join(rgb_fn.split("-")[:3])
@@ -142,6 +154,7 @@ def worker(arg_tup):
 
 
 def main():
+    """ The main function """
     # Read arguments
     args = arg_reader()
     # Create out_dir if not existing
