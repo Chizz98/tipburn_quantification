@@ -27,6 +27,7 @@ def arg_reader():
 
 
 def main():
+    """ The main function """
     args = arg_reader()
     files = [args.filename + "/" + file for file in os.listdir(args.filename)]
     tipburn_segmentation.parse_segmentations(files, args.out)

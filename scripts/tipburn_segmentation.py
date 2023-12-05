@@ -113,6 +113,14 @@ def segment_file(arg_tup):
 
 
 def parse_segmentations(image_files, out_dir):
+    """ Function to parse segmentation images
+
+    :param image_files: str, the directory containing the RGB images matching
+        the segmentation masks in out_dir
+    :param out_dir: str, the directory to write the pixel table, also contains
+        the segmentation masks as grayscale images
+    :return: None, writes a tab separated file
+    """
     filename_pattern = re.compile(r".*[\/\\]([0-9]+)-([0-9]+).+Tray_0([0-9]*)"
                                   r".+pos([0-9*])_(.*).png")
     outfile = open(out_dir + "/pixel_table.txt", "w")
@@ -155,11 +163,19 @@ def parse_segmentations(image_files, out_dir):
 
 
 def pool_handler(cores, fun, params):
+    """ Multiprocessing pool handler
+
+    :param cores: int, amount of cores to be used
+    :param fun: function, the worker function
+    :param params: tuple, the parameter tuples
+    :return: None, maps arguments to function
+    """
     pools = Pool(cores)
     pools.map(fun, params)
 
 
 def main():
+    """ The main function """
     # Read arguments
     args = arg_reader()
     # Create out_dir if not existing

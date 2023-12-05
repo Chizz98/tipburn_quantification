@@ -207,6 +207,15 @@ def canny_rag_cen(image, mask, sigma, rag_thresh=40):
 
 
 def paint_col(image, mask, color_tuple):
+    """ Makes masked area the specified color
+
+    :param image: np.ndarray, 3d array representing an RGB image
+    :param mask: np.ndarray, 2d binary mask
+    :param color_tuple: tuple, contains the values in integer of the R, G and B
+        channel that you want to paint
+    :return: np.ndarray, same as input image but with the masked area painted in
+        the specified color
+    """
     image = image.copy()
     image[:, :, 0][mask == 0] = color_tuple[0]
     image[:, :, 1][mask == 0] = color_tuple[1]
