@@ -43,6 +43,14 @@ def arg_reader():
 
 
 def rough_crop(mask_a, mask_b, step):
+    """ Takes stepwise crops of mask b to get best match with mask a
+
+    :param mask_a: np.ndarray, binary mask to be matched with b
+    :param mask_b: np.ndarray, larger binary mask, mask a should fit within
+    :param step: int, the step size used to move mask a over mask b
+    :return: tuple, the centre of the crop where mask_a had the greatest
+        similarity with mask_b
+    """
     rough_overlap_dict = {}
     min_r = mask_a.shape[0] // 2
     max_r = mask_b.shape[0] - mask_a.shape[0] // 2
@@ -58,6 +66,12 @@ def rough_crop(mask_a, mask_b, step):
 
 
 def overlap_crop(rgb_im, full_image):
+    """ Uses initial rough crop with phase cross correlation to get match crops
+
+    :param rgb_im: np.ndarray, 3d array representing an RGB image
+    :param full_image: np.ndarray, 2d array representing grayscale image
+    :return: tuple, the centre of the phase cross correlated rough crop
+    """
     mask_a = segment.shw_segmentation(rgb_im)
     mask_b = full_image > filters.threshold_otsu(full_image)
     rough_cen = rough_crop(mask_a, mask_b, 50)
@@ -75,6 +89,11 @@ def overlap_crop(rgb_im, full_image):
 
 
 def worker(arg_tup):
+    """ Worker for multiprocessing
+
+    :param arg_tup: tuple, contains arguments
+    :return: None, writes outfiles
+    """
     fm, rgbs, cmd_args = arg_tup
     if rgbs:
         try:
@@ -107,11 +126,19 @@ def worker(arg_tup):
 
 
 def pool_handler(cores, fun, params):
+    """ Multiprocessing pool handler
+
+    :param cores: int, amount of cores to be used
+    :param fun: function, the worker function
+    :param params: tuple, the parameter tuples
+    :return: None, maps arguments to function
+    """
     pools = Pool(cores)
     pools.map(fun, params)
 
 
 def main():
+    """ The main function """
     # Read arguments
     args = arg_reader()
     # Create out_dir if not existing
