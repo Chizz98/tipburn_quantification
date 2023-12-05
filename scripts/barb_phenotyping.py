@@ -1,4 +1,11 @@
-from skimage import io, color, morphology, util, measure, feature
+#!/usr/bin/env python3
+"""
+Author: Chris Dijkstra
+
+Script for segmentation of unhealthy from healthy tissue in RGB colorspace.
+"""
+
+from skimage import io, color, morphology, util
 import matplotlib.pyplot as plt
 import segment
 import utils

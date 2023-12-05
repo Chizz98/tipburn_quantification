@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 Author: Chris Dijkstra
-Date: 2/10/2023
 
 Contains the class SkeletonNetwork, which can be utilized to read in skele-
 tonized images and output an edge graph, where each intersection of lines is

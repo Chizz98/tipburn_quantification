@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+Author: Chris Dijkstra
+
+Script for segmentation of RGB images based on a tray registration file.
+"""
+
 from skimage import io, color
 import utils
 import matplotlib.pyplot as plt

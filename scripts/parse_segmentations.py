@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+Author: Chris Dijkstra
+
+Parses the masks output by segmentation scripts into a tab separated file.
+"""
+
 import tipburn_segmentation
 import argparse as arg
 import os

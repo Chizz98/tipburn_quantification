@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+Author: Chris Dijkstra
+
+Contains functions for cropping fluorescence files.
+"""
 from skimage import io, measure, registration, transform, filters
 import utils
 import argparse as arg

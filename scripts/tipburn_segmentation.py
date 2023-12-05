@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""
+Author: Chris Dijkstra
+
+Script for segmentation of RGB images into foreground and background,
+and for splitting the foreground into healthy and unhealthy tissue.
+"""
 import os
 import segment
 import utils
@@ -167,8 +173,6 @@ def main():
         [args.d] * len(files))
     # Pooled segmentation
     pool_handler(args.c, segment_file, param_list)
-    # Parse segmentations into file
-    parse_segmentations(files, args.out)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""
+Author: Chris Dijkstra
+
+Contains functions for segmenting tipburn and healthy tissue based on combined
+masks of RGB and chlorophyll fluorescence.
+"""
 import os
 import segment
 import utils

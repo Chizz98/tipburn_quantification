@@ -3,7 +3,7 @@
 Author: Chris Dijkstra
 Date: 10/10/2023
 
-Contains functions for segmenting RGB images
+Contains functions for segmenting image arrays.
 """
 from skimage import io, color, filters, segmentation, util, morphology
 import numpy as np
