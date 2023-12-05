@@ -35,6 +35,15 @@ def arg_reader():
 
 
 def crop_images(image, poslist, shape):
+    """ Crops an image based on input shape and positions.
+
+    :param image: np.ndarray, the full image that needs to be cropped.
+    :param poslist: list of ints, the positions that need to be cropped out of
+        the main image, gets matched with internal coord_dict.
+    :param shape: tuple of ints, the height and width of the output crops in
+        pixels
+    :return: list of np.ndarrays, the crops from the main image.
+    """
     poslist.sort()
     coord_dict = {
         1: (1330, 810),
@@ -53,7 +62,13 @@ def crop_images(image, poslist, shape):
     return croplist
 
 
-def parse_trayfile(filename):
+def _parse_trayfile(filename):
+    """ Reads in the trayfile, output used for cropping
+
+    :param filename: str, the path and filename of the tray registration file
+    :return: dict, tray numbers are the key, tuples of pos (str) and accession
+        (str) are the values.
+    """
     acc_dict = {}
     with open(filename) as infile:
         for line in infile:
@@ -69,18 +84,17 @@ def parse_trayfile(filename):
 
 
 def main():
+    """ The main function """
     args = arg_reader()
-    acc_inf = parse_trayfile(args.trayfile)
+    acc_inf = _parse_trayfile(args.trayfile)
     tray_pattern = re.compile(r"Tray_0(\d+)")
     filecount = 0
     if not os.path.isdir(args.out):
         os.mkdir(args.out)
     if os.path.isdir(args.filename):
         files = [file for file in os.listdir(args.filename) if
-                 file.find("Original") != -1 and file.startswith(
-                     ("51-15", "51-24", "51-33", "51-42", "51-51", "51-60",
-                      "51-69")
-                 )]
+                 file.find("Original") != -1
+                 ]
         tot_files = len(files)
         for file in files:
             try:
