@@ -9,7 +9,7 @@ import re
 def arg_reader():
     """ Reads arguments from command line
 
-    :return ..., class containing the arguments
+    :return class containing the arguments
     """
     arg_parser = arg.ArgumentParser(
         description="Crops phenovator files"

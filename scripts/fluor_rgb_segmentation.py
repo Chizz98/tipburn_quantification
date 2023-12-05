@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 def arg_reader():
     """ Reads arguments from command line
 
-    :return ..., class containing the arguments
+    :return class containing the arguments
     """
     arg_parser = arg.ArgumentParser(
         description="Segments rgb images based on predetermined thresholds"

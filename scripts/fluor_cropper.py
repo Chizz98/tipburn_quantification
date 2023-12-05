@@ -12,7 +12,7 @@ import numpy as np
 def arg_reader():
     """ Reads arguments from command line
 
-    :return ..., class containing the arguments
+    :return class containing the arguments
     """
     arg_parser = arg.ArgumentParser(
         description="Creates crops of fluorescence images that match RGB crops."
