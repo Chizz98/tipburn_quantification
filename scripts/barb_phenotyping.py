@@ -17,7 +17,7 @@ import os
 def arg_reader():
     """ Reads arguments from command line
 
-    :return ..., class containing the arguments
+    :return Object containing the arguments
     """
     arg_parser = arg.ArgumentParser(
         description="Segments rgb images based on predetermined thresholds"
@@ -82,6 +82,7 @@ def barb_hue(image, bg_mask=None):
 
 
 def main():
+    """ The main function """
     args = arg_reader()
     directory = args.filename
     if not os.path.isdir(args.out):
