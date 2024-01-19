@@ -125,6 +125,7 @@ def worker(arg_tup):
     fvfm_im = filters.median(fvfm_im, footprint=morphology.disk(2.5))
     fvfm_im = utils.increase_contrast(fvfm_im)
     fm_mask = fvfm_im > fluor_thresh(fvfm_im[bg_mask == 1])
+    fm_mask = morphology.closing(fm_mask, footprint=morphology.disk(8))
     fm_comp = fm_mask.astype(int) + bg_mask.astype(int)
     # Combined mask
     final_mask = np.zeros_like(comp_mask)
