@@ -122,7 +122,7 @@ def worker(arg_tup):
     )
     comp_mask = bg_mask
     comp_mask[morphology.opening(
-        comp_mask == 2,
+        tb_mask == 2,
         footprint=morphology.disk(2.5))] = 2
 
     # Handle fluor
