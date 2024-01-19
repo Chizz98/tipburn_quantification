@@ -116,10 +116,15 @@ def worker(arg_tup):
         bg_mask,
         area_threshold=bg_mask.shape[0] * bg_mask.shape[1] // 1000
     )
-    comp_mask = segment.barb_hue(
+    tb_mask = segment.barb_hue(
         rgb_im,
         morphology.erosion(bg_mask.copy(), footprint=morphology.disk(2))
     )
+    comp_mask = bg_mask
+    comp_mask[morphology.opening(
+        comp_mask == 2,
+        footprint=morphology.disk(2.5))] = 2
+
     # Handle fluor
     fvfm_im = np.load(fluor_dir + "/" + fluor_match)
     fvfm_im = filters.median(fvfm_im, footprint=morphology.disk(2.5))
