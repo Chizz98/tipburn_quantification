@@ -121,10 +121,11 @@ def worker(arg_tup):
         morphology.erosion(bg_mask.copy(), footprint=morphology.disk(2))
     )
     comp_mask = bg_mask.astype(int)
-    comp_mask[morphology.remove_small_objects(
-        morphology.opening(
-            tb_mask == 2,
-            footprint=morphology.disk(2)))] = 2
+    comp_mask[
+        morphology.remove_small_objects(
+            morphology.opening(
+                tb_mask == 2,
+                footprint=morphology.disk(2)))] = 2
 
     # Handle fluor
     fvfm_im = np.load(fluor_dir + "/" + fluor_match)
