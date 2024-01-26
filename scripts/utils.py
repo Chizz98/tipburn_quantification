@@ -133,9 +133,6 @@ def canny_labs(image, mask, sigma):
     canny_f = morphology.skeletonize(canny_f)
     mask = mask.copy()
     mask[canny_f == 1] = 0
-    mask = morphology.remove_small_objects(
-        mask, min_size=mask.shape[0] * mask.shape[1] // 10000
-    )
     labels = measure.label(mask, connectivity=1)
     return morphology.dilation(labels)
 
@@ -154,19 +151,20 @@ def centre_primary_label(lab_im, radius=200, bg_label=0):
     return np.argmax(np.bincount(crop[crop != bg_label].ravel()))
 
 
-def canny_central_ob(image, mask, sigma):
+def canny_central_ob(image, mask, sigma, central_area=200):
     """ Uses canny filter and color channel thresholding to take central object
 
     :param image: np.ndarray, 3d array representing rgb image
     :param mask: np.ndarray, 2d boolean array representing background mask
     :param sigma: float, sigma used for gaussian blur step of canny edge
         detection
+    :param central_area: int, central area size
     :return np.ndarray, 2d binary mask of central object
     """
     bg_labs = measure.label(mask)
     mask = bg_labs == centre_primary_label(bg_labs)
     canny_labelled = canny_labs(color.rgb2gray(image), mask, sigma)
-    prim_lab = centre_primary_label(canny_labelled)
+    prim_lab = centre_primary_label(canny_labelled, central_area)
     average_cols = color.label2rgb(canny_labelled, image, kind="avg")
     average_cols = color.rgb2hsv(average_cols)
     prim_area = multichannel_mask(average_cols, canny_labelled == prim_lab)
