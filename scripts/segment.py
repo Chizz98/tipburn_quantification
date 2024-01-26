@@ -116,10 +116,11 @@ def sw_segmentation(image):
     return mask
 
 
-def shw_segmentation(image):
+def shw_segmentation(image, distance=10):
     """ Creates binary image through sobel + histogram thresholds + watershed
 
     :param image: np.ndarray representing a 3d image
+    :param distance: int, minimal distance between local maxima an minima
     :return np.ndarray, 2D mask for the image
     """
     if image.shape[2] == 4:
