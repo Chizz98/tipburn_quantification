@@ -116,11 +116,13 @@ def sw_segmentation(image):
     return mask
 
 
-def shw_segmentation(image, distance=10):
+def shw_segmentation(image, distance=10, bg_mod=0.15, fg_mod=0.2):
     """ Creates binary image through sobel + histogram thresholds + watershed
 
     :param image: np.ndarray representing a 3d image
-    :param distance: int, minimal distance between local maxima an minima
+    :param distance: int, minimal distance between local maxima and minima
+    :param bg_mod: float, modifier for histogram segmentation
+    :param fg_mod: float, modifier for histogram segmentation
     :return np.ndarray, 2D mask for the image
     """
     if image.shape[2] == 4:
@@ -129,14 +131,14 @@ def shw_segmentation(image, distance=10):
     comp_sob = comp_sob[:, :, 0] + comp_sob[:, :, 1] + comp_sob[:, :, 2]
     elevation = filters.sobel(comp_sob)
     values, bins = np.histogram(comp_sob, bins=100)
-    max_i, _ = signal.find_peaks(values, distance=10)
+    max_i, _ = signal.find_peaks(values, distance=distance)
     max_bins = bins[max_i]
-    min_i, _ = signal.find_peaks(-values, distance=10)
+    min_i, _ = signal.find_peaks(-values, distance=distance)
     min_bins = bins[min_i]
     min_bins = min_bins[min_bins > max_bins[0]]
     markers = np.zeros_like(comp_sob)
-    markers[comp_sob <= max_bins[0] + (0.15 * (min_bins[0] - max_bins[0]))] = 1
-    markers[comp_sob >= min_bins[0] + (0.2 * (max_bins[1] - min_bins[0]))] = 2
+    markers[comp_sob <= max_bins[0] + (bg_mod * (min_bins[0] - max_bins[0]))] = 1
+    markers[comp_sob >= min_bins[0] + (fg_mod * (max_bins[1] - min_bins[0]))] = 2
     mask = segmentation.watershed(elevation, markers)
     mask = morphology.erosion(mask, footprint=morphology.disk(2))
     return mask - 1
