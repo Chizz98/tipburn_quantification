@@ -10,7 +10,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
 # Image handling
 import utils
 import segment
-from skimage import io, color
+from skimage import io, color, util
 import numpy as np
 
 
@@ -192,7 +192,7 @@ class MainWindow(tk.Tk):
         else:
             self.im_arr = io.imread(self.filename)
             if self.im_arr.shape[2] == 4:
-                self.im_arr = color.rgba2rgb(self.im_arr)
+                self.im_arr = util.img_as_ubyte(color.rgba2rgb(self.im_arr))
             self.mask_arr = np.zeros(self.im_arr.shape[0:2])
             self.bt_watershed.configure(state="normal")
             self.bt_hsv.configure(state="normal")
