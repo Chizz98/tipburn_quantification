@@ -98,6 +98,8 @@ def increase_contrast(im_channel):
     """
     ch_min = im_channel.min()
     ch_max = im_channel.max()
+    if ch_max == ch_min:
+        raise ValueError("All values in the image are identical.")
     out = (im_channel - ch_min) / (ch_max - ch_min)
     return out
 
