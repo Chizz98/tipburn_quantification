@@ -48,7 +48,7 @@ def segment_file(arg_tup):
     """ Reads an image file and segments foreground from background
 
     :return arg_tup: tuple, contains all parameters in order filename, outfile,
-        sigma
+        sigma, diagnostic
     :return: np.ndarray, binary segmentation of the image.
     """
     filename, outfile, sigma, diagnostic = arg_tup
@@ -150,6 +150,18 @@ def parse_segmentations(image_files, out_dir):
     outfile.close()
 
 
+def worker_wrapper(params):
+    """ Wrapper to allow the process to continue when errors occur
+
+    :param params: tuple, the parameter tuples
+    :return: None, handles errors for worker function
+    """
+    try:
+        segment_file(params)
+    except Exception as e:
+        print(f"An error occurred in worker: {str(e)}")
+
+
 def pool_handler(cores, fun, params):
     """ Multiprocessing pool handler
 
@@ -176,7 +188,7 @@ def main():
         [args.s] * len(files),
         [args.d] * len(files))
     # Pooled segmentation
-    pool_handler(args.c, segment_file, param_list)
+    pool_handler(args.c, worker_wrapper, param_list)
 
 
 if __name__ == "__main__":
