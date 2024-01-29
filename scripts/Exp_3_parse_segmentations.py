@@ -4,6 +4,23 @@ import utils
 import os
 import re
 import matplotlib.pyplot as plt
+import argparse as arg
+
+
+def arg_reader():
+    """ Reads arguments from command line
+
+    :return class containing the arguments
+    """
+    arg_parser = arg.ArgumentParser(
+        description="Segments rgb images based on predetermined thresholds"
+    )
+    arg_parser.add_argument("filename", help="The path to the directory holding"
+                                             " the images")
+    arg_parser.add_argument("out", help="The directory to write the pixel table"
+                                        "to. Does not need to be "
+                                        "pre_existing.")
+    return arg_parser.parse_args()
 
 
 def parse_segmentations(im_dir, out_dir):
@@ -53,9 +70,10 @@ def parse_segmentations(im_dir, out_dir):
 
 
 def main():
+    args = arg_reader()
     parse_segmentations(
-        r"E:\Mscthesis\Exp3\crops\25-01-2024",
-        r"E:\Mscthesis\Exp3\25-01-2024_s2.5_div3.5_nd"
+        args.filename,
+        args.out
     )
 
 
