@@ -53,7 +53,6 @@ def segment_file(arg_tup):
     """
     filename, outfile, sigma, diagnostic = arg_tup
     print(f"Starting bg_segmentation of {filename}")
-    out_fn = outfile + "/" + filename.split("/")[-1]
     try:
         rgb_im = io.imread(filename)
         if rgb_im.shape[2] == 4:
@@ -61,6 +60,7 @@ def segment_file(arg_tup):
     except:
         print(f"Could not open {filename}")
         return
+    # Background masking
     bg_mask = segment.shw_segmentation(rgb_im, distance=15, bg_mod=0.5,
                                        fg_mod=0.5)
     bg_mask = morphology.closing(bg_mask, footprint=morphology.disk(5))
@@ -69,21 +69,33 @@ def segment_file(arg_tup):
     except:
         print(f"Could not isolate primary object in {filename}")
     bg_mask = morphology.opening(bg_mask, footprint=morphology.disk(3.5))
-    io.imsave(
-        os.path.join(outfile, filename.split("/")[-1].replace(".jpg", ".png")),
-        bg_mask
+    # Tipburn masking
+    comp_mask = segment.barb_hue(rgb_im, bg_mask, 3.5)
+    plt.imsave(
+        fname=os.path.join(outfile,
+                           filename.split("/")[-1].replace(".jpg", ".png")),
+        arr=comp_mask.astype("uint8"),
+        cmap="binary_r",
+        vmin=0,
+        vmax=2
     )
-
     if diagnostic:
         diag_path = os.path.join(outfile, "diagnostic")
         if not os.path.isdir(diag_path):
             os.mkdir(diag_path)
-        io.imsave(
+        plt.imsave(
             os.path.join(
                 diag_path,
                 filename.split("/")[-1]
             ).replace(".jpg", "_bg.jpg"),
             segmentation.mark_boundaries(rgb_im, bg_mask)
+        )
+        plt.imsave(
+            os.path.join(
+                diag_path,
+                filename.split("/")[-1]
+            ).replace(".jpg", "_tb.jpg"),
+            segmentation.mark_boundaries(rgb_im, comp_mask == 2)
         )
 
 
