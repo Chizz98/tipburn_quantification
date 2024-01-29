@@ -20,7 +20,7 @@ def parse_segmentations(im_dir, out_dir):
         r"Camera(?P<Camera>[0-9]+)_(?P<Date>[0-9]+-[0-9]+-[0-9]+)_"
         r"(?P<Hour>[0-9]+).+"
     )
-    outfile = open(out_dir + "/pixel_table.txt", "w")
+    outfile = open(os.path.join(out_dir, "pixel_table.txt"), "w")
     outfile.write("\t".join(
         ["Accession", "Tray", "Pos", "Camera", "Date", "Hour", "Healhy",
          "Brown"]) + "\n"
