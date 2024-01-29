@@ -162,13 +162,15 @@ def merge_masks(bg_mask, pheno_mask):
     return comb_mask
 
 
-def barb_thresh(im_channel):
+def barb_thresh(im_channel, div=3):
     """ Defines the threshold of an image channel based on its histogram
 
-      :param im_channel: np.ndarray, 2d array, meant to be hue channel of hsv or
-          a channel of lab
-      :return float, the threshold of the image channel that separates it into
-          healthy and unhealthy tissue
+    :param im_channel: np.ndarray, 2d array, meant to be hue channel of hsv or
+        a channel of lab
+    :param div: int, the divisor used at the end of the algorithm. A higher
+        divisor will lead to a lower threshold
+    :return float, the threshold of the image channel that separates it into
+        healthy and unhealthy tissue
     """
     values, bins = np.histogram(im_channel, bins=100)
     peak_i = np.argmax(values)
@@ -185,13 +187,15 @@ def barb_thresh(im_channel):
     return thresh
 
 
-def barb_hue(image, bg_mask=None):
+def barb_hue(image, bg_mask=None, div=3):
     """ Takes an image of plant tissue and segments into healthy and brown
 
-      :param image: np.ndarray, 3d array representing an rgb image
-      :param bg_mask: np.ndarray, 2d array to mask the background
-      :return np.ndarray, mask with background as 0, healthy tissue as 1 and
-          brown tissue as 2
+    :param image: np.ndarray, 3d array representing an rgb image
+    :param bg_mask: np.ndarray, 2d array to mask the background
+    :param div: int, the divisor used at the end of the algorithm. A higher
+        divisor will lead to a lower threshold
+    :return np.ndarray, mask with background as 0, healthy tissue as 1 and
+        brown tissue as 2
     """
     if bg_mask is not None:
         # Apply mask to rgb_im
@@ -201,7 +205,7 @@ def barb_hue(image, bg_mask=None):
     hue_con = utils.increase_contrast(hue)
     hue_fg = hue_con[bg_mask == 1]
     # Healthy tissue masking
-    thresh = barb_thresh(hue_fg)
+    thresh = barb_thresh(hue_fg, div)
     healthy_mask = (hue_con > thresh).astype(int)
     # Remove noise
     healthy_mask = morphology.remove_small_holes(

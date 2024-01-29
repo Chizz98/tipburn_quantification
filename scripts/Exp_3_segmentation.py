@@ -73,6 +73,7 @@ def segment_file(arg_tup):
         os.path.join(outfile, filename.split("/")[-1].replace(".jpg", ".png")),
         bg_mask
     )
+
     if diagnostic:
         diag_path = os.path.join(outfile, "diagnostic")
         if not os.path.isdir(diag_path):
@@ -81,7 +82,7 @@ def segment_file(arg_tup):
             os.path.join(
                 diag_path,
                 filename.split("/")[-1]
-            ),
+            ).replace(".jpg", "_bg.jpg"),
             segmentation.mark_boundaries(rgb_im, bg_mask)
         )
 
