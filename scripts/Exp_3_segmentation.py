@@ -68,6 +68,7 @@ def segment_file(arg_tup):
         bg_mask = utils.canny_central_ob(rgb_im, bg_mask, sigma)
     except:
         print(f"Could not isolate primary object in {filename}")
+        return
     bg_mask = morphology.opening(bg_mask, footprint=morphology.disk(3.5))
     # Tipburn masking
     comp_mask = segment.barb_hue(rgb_im, bg_mask, 3.5)
