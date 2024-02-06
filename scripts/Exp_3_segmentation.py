@@ -38,8 +38,7 @@ def shw_segmentation(image, distance=10, bg_mod=0.15, fg_mod=0.2):
     min_bins = bins[min_i]
     min_bins = min_bins[min_bins > max_bins[0]]
     markers = np.zeros_like(comp_sob)
-    markers[comp_sob <=
-            (max_bins[0] + (bg_mod * (min_bins[0] - max_bins[0]))) |
+    markers[(comp_sob <= max_bins[0] + (bg_mod * (min_bins[0] - max_bins[0]))) |
             (color.rgb2hsv(image)[:, :, 0] > 0.35)] = 1
     markers[comp_sob >= min_bins[0] + (fg_mod * (max_bins[1] - min_bins[0]))] = 2
     mask = segmentation.watershed(elevation, markers)
