@@ -8,12 +8,43 @@ and for splitting the foreground into healthy and unhealthy tissue.
 import os
 import segment
 import utils
-from skimage import io, util, color, morphology, segmentation
+from skimage import io, util, color, morphology, segmentation, filters
+from scipy import signal
 from multiprocessing import Pool
 import numpy as np
 import argparse as arg
 import matplotlib.pyplot as plt
 import re
+
+
+def shw_segmentation(image, distance=10, bg_mod=0.15, fg_mod=0.2):
+    """ Creates binary image through sobel + histogram thresholds + watershed
+
+    :param image: np.ndarray representing a 3d image
+    :param distance: int, minimal distance between local maxima and minima
+    :param bg_mod: float, modifier for histogram segmentation
+    :param fg_mod: float, modifier for histogram segmentation
+    :return np.ndarray, 2D mask for the image
+    """
+    if image.shape[2] == 4:
+        image = util.img_as_ubyte(color.rgba2rgb(image))
+    comp_sob = filters.sobel(image)
+    comp_sob = comp_sob[:, :, 0] + comp_sob[:, :, 1] + comp_sob[:, :, 2]
+    elevation = filters.sobel(comp_sob)
+    values, bins = np.histogram(comp_sob, bins=100)
+    max_i, _ = signal.find_peaks(values, distance=distance)
+    max_bins = bins[max_i]
+    min_i, _ = signal.find_peaks(-values, distance=distance)
+    min_bins = bins[min_i]
+    min_bins = min_bins[min_bins > max_bins[0]]
+    markers = np.zeros_like(comp_sob)
+    markers[comp_sob <=
+            (max_bins[0] + (bg_mod * (min_bins[0] - max_bins[0]))) |
+            (color.rgb2hsv(image)[:, :, 0] > 0.35)] = 1
+    markers[comp_sob >= min_bins[0] + (fg_mod * (max_bins[1] - min_bins[0]))] = 2
+    mask = segmentation.watershed(elevation, markers)
+    mask = morphology.erosion(mask, footprint=morphology.disk(2))
+    return mask - 1
 
 
 def arg_reader():
@@ -61,8 +92,8 @@ def segment_file(arg_tup):
         print(f"Could not open {filename}")
         return
     # Background masking
-    bg_mask = segment.shw_segmentation(rgb_im, distance=15, bg_mod=0.5,
-                                       fg_mod=0.5)
+    bg_mask = shw_segmentation(rgb_im, distance=15, bg_mod=0.5,
+                               fg_mod=0.5)
     bg_mask = morphology.closing(bg_mask, footprint=morphology.disk(5))
     try:
         bg_mask = utils.canny_central_ob(rgb_im, bg_mask, sigma)
