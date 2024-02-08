@@ -139,6 +139,7 @@ def shw_segmentation(image, distance=10, bg_mod=0.15, fg_mod=0.2):
     markers = np.zeros_like(comp_sob)
     markers[comp_sob <= max_bins[0] + (bg_mod * (min_bins[0] - max_bins[0]))] = 1
     markers[comp_sob >= min_bins[0] + (fg_mod * (max_bins[1] - min_bins[0]))] = 2
+    markers = markers.astype(int)
     mask = segmentation.watershed(elevation, markers)
     mask = morphology.erosion(mask, footprint=morphology.disk(2))
     return mask - 1
